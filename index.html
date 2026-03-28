@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html class="light" lang="th">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<title>Stock Project Zero</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+tailwind.config = {
+  darkMode:"class",
+  theme:{extend:{colors:{"tertiary-fixed":"#ffdbc9","on-tertiary-container":"#ffceb4","on-secondary-container":"#495e7f","error":"#ba1a1a","tertiary":"#753400","surface-container-lowest":"#ffffff","primary-container":"#005faf","outline":"#727783","background":"#f9f9ff","error-container":"#ffdad6","on-error-container":"#93000a","on-background":"#191c21","on-tertiary-fixed-variant":"#753400","surface":"#f9f9ff","on-secondary":"#ffffff","on-surface":"#191c21","primary-fixed":"#d4e3ff","on-surface-variant":"#414751","surface-variant":"#e1e2e9","on-primary-container":"#c4daff","secondary-container":"#c2d8fe","secondary":"#4a5f80","surface-container-low":"#f2f3fb","primary":"#004786","on-primary":"#ffffff","surface-container-highest":"#e1e2e9","outline-variant":"#c1c6d3","surface-container-high":"#e7e8ef","surface-container":"#ecedf5","secondary-fixed":"#d4e3ff","tertiary-fixed-dim":"#ffb68c"},fontFamily:{headline:["Manrope"],body:["Inter"],label:["Inter"]},borderRadius:{DEFAULT:"0.25rem",lg:"0.5rem",xl:"0.75rem",full:"9999px"}}}
+}
+</script>
+<style>
+.material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24}
+.fill-icon{font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24}
+.scrollbar-hide::-webkit-scrollbar{display:none}
+.scrollbar-hide{-ms-overflow-style:none;scrollbar-width:none}
+.page{display:none}
+.page.active{display:block}
+#page-app{padding-bottom:100px}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeIn 0.25s ease forwards}
+#toast{transform:translateY(80px);transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1)}
+#toast.show{transform:translateY(0)}
+.panel-overlay{opacity:0;pointer-events:none;transition:opacity 0.25s}
+.panel-overlay.open{opacity:1;pointer-events:all}
+.panel-sheet{transform:translateY(100%);transition:transform 0.3s cubic-bezier(0.32,0.72,0,1)}
+.panel-overlay.open .panel-sheet{transform:translateY(0)}
+</style>
+</head>
+<body class="bg-background text-on-background font-body min-h-screen">
+
+<div class="page active min-h-screen flex items-center justify-center px-6 py-12" id="page-login" style="background:linear-gradient(135deg,#f9f9ff 0%,#e7e8ef 100%)">
+  <div class="w-full max-w-sm">
+    <div class="text-center mb-10">
+      <div class="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center mx-auto mb-4" style="box-shadow:0 8px 24px rgba(0,71,134,0.25)">
+        <span class="material-symbols-outlined text-white text-4xl">inventory_2</span>
+      </div>
+      <h1 class="font-headline text-2xl font-extrabold text-on-surface">Stock Project Zero</h1>
+      <p class="text-on-surface-variant text-sm mt-1">บ้านศรีนครินทร์</p>
+    </div>
+    <div class="bg-white rounded-2xl p-6" style="box-shadow:0 16px 40px rgba(25,28,33,0.08)">
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-on-surface-variant mb-1.5">อีเมล</label>
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-xl">mail</span>
+            <input id="login-email" type="email" placeholder="name@example.com" class="w-full pl-10 pr-4 py-3 bg-surface-container-low rounded-xl text-sm text-on-surface border-0 focus:ring-2 focus:ring-primary outline-none"/>
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-on-surface-variant mb-1.5">รหัสผ่าน</label>
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-xl">lock</span>
+            <input id="login-password" type="password" placeholder="••••••••" class="w-full pl-10 pr-4 py-3 bg-surface-container-low rounded-xl text-sm text-on-surface border-0 focus:ring-2 focus:ring-primary outline-none"/>
+          </div>
+        </div>
+        <button onclick="login()" class="w-full py-3.5 rounded-xl font-headline font-bold text-white text-sm mt-2 active:scale-95 transition-transform" style="background:linear-gradient(135deg,#004786,#00539a);box-shadow:0 4px 16px rgba(0,71,134,0.3)">เข้าสู่ระบบ</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="page" id="page-app" style="max-width:480px;margin:0 auto;">
+  <nav class="sticky top-0 z-50 bg-surface-container-low flex items-center justify-between px-4 py-3" style="padding-top:max(12px,env(safe-area-inset-top))">
+    <div class="flex items-center gap-2">
+      <span class="material-symbols-outlined text-primary">inventory_2</span>
+      <span class="font-headline font-extrabold text-primary text-lg" id="nav-title">คลังสินค้า</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <button onclick="toggleSearch()" class="p-2 rounded-full hover:bg-surface-container transition-colors">
+        <span class="material-symbols-outlined text-on-surface-variant">search</span>
+      </button>
+      <button onclick="showPage('login')" class="w-8 h-8 rounded-full bg-primary-fixed flex items-center justify-center">
+        <span class="font-headline font-bold text-xs text-primary" id="user-initials">—</span>
+      </button>
+    </div>
+  </nav>
+
+  <div id="search-bar" class="hidden px-4 pb-3 bg-surface-container-low">
+    <div class="relative">
+      <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-lg">search</span>
+      <input id="search-input" oninput="filterItems()" type="text" placeholder="ค้นหาชื่อสินค้า หรือรหัส..." class="w-full pl-9 pr-4 py-2.5 bg-surface-container-highest rounded-full text-sm border-0 focus:ring-2 focus:ring-primary outline-none"/>
+    </div>
+  </div>
+
+  <section id="tab-inventory">
+    <div class="px-4 pt-4 pb-2">
+      <h1 class="font-headline text-2xl font-extrabold text-on-surface mb-4">คลังสินค้า</h1>
+      <div class="grid grid-cols-3 gap-3 mb-4">
+        <div class="bg-surface-container-low p-3 rounded-xl">
+          <span class="material-symbols-outlined text-primary text-lg">account_balance_wallet</span>
+          <p class="text-on-surface-variant text-[10px] font-semibold uppercase tracking-wide mt-1">ทรัพย์สิน</p>
+          <p id="stat-asset" class="font-headline text-xl font-bold text-on-surface">—</p>
+        </div>
+        <div class="bg-surface-container-low p-3 rounded-xl">
+          <span class="material-symbols-outlined text-secondary text-lg">package_2</span>
+          <p class="text-on-surface-variant text-[10px] font-semibold uppercase tracking-wide mt-1">ของเบิก</p>
+          <p id="stat-supply" class="font-headline text-xl font-bold text-on-surface">—</p>
+        </div>
+        <div class="bg-surface-container-low p-3 rounded-xl">
+          <span class="material-symbols-outlined text-tertiary text-lg">outbox</span>
+          <p class="text-on-surface-variant text-[10px] font-semibold uppercase tracking-wide mt-1">เบิกวันนี้</p>
+          <p id="stat-today" class="font-headline text-xl font-bold text-on-surface">—</p>
+        </div>
+      </div>
+      <div class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+        <button onclick="filterType('all')" id="ftab-all" class="px-5 py-2 rounded-full bg-primary text-white text-xs font-semibold whitespace-nowrap shrink-0 transition-all">ทั้งหมด</button>
+        <button onclick="filterType('asset')" id="ftab-asset" class="px-5 py-2 rounded-full bg-surface-container text-on-surface-variant text-xs font-semibold whitespace-nowrap shrink-0 transition-all">ทรัพย์สิน</button>
+        <button onclick="filterType('supply')" id="ftab-supply" class="px-5 py-2 rounded-full bg-surface-container text-on-surface-variant text-xs font-semibold whitespace-nowrap shrink-0 transition-all">ของเบิก</button>
+      </div>
+    </div>
+    <div class="px-4 pb-4">
+      <div id="item-grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;">
+        <div class="col-span-2 text-center text-on-surface-variant text-sm py-12">กำลังโหลด...</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="tab-history" class="hidden px-4 pt-4">
+    <h1 class="font-headline text-2xl font-extrabold text-on-surface mb-4">ประวัติการเบิก</h1>
+    <div id="history-list" class="space-y-3"><div class="text-center text-on-surface-variant text-sm py-12">กำลังโหลด...</div></div>
+  </section>
+
+  <section id="tab-withdraw" class="hidden px-4 pt-4 pb-6 space-y-4">
+    <h1 class="font-headline text-2xl font-extrabold text-on-surface mb-2">เบิกของ</h1>
+    <div class="bg-white rounded-2xl p-4 space-y-3" style="box-shadow:0 4px 16px rgba(25,28,33,0.06)">
+      <p class="text-xs font-semibold uppercase tracking-wider text-on-surface-variant">ผู้เบิก</p>
+      <select id="withdraw-member" class="w-full px-3 py-2.5 bg-surface-container-low rounded-xl text-sm border-0 focus:ring-2 focus:ring-primary outline-none"><option value="">— เลือกบุคลากร —</option></select>
+    </div>
+    <div class="bg-white rounded-2xl p-4 space-y-3" style="box-shadow:0 4px 16px rgba(25,28,33,0.06)">
+      <p class="text-xs font-semibold uppercase tracking-wider text-on-surface-variant">สินค้า</p>
+      <button onclick="openQR()" class="w-full border-2 border-dashed border-outline-variant rounded-xl py-4 flex flex-col items-center gap-1 bg-surface-container-low active:bg-surface-container transition-colors">
+        <span class="material-symbols-outlined text-outline text-3xl">qr_code_scanner</span>
+        <span class="text-sm text-on-surface-variant">แตะสแกน QR Code</span>
+      </button>
+      <div>
+        <label class="block text-xs text-on-surface-variant mb-1">รหัสสินค้า / ค้นหาชื่อ</label>
+        <input id="withdraw-code" oninput="lookupItem(this.value)" type="text" placeholder="เช่น SNR00027" class="w-full px-3 py-2.5 bg-surface-container-low rounded-xl text-sm border-0 focus:ring-2 focus:ring-primary outline-none"/>
+      </div>
+      <div id="item-preview" class="rounded-xl p-3 flex items-center gap-3 bg-surface-container hidden"></div>
+    </div>
+    <div class="bg-white rounded-2xl p-4 space-y-3" style="box-shadow:0 4px 16px rgba(25,28,33,0.06)">
+      <p class="text-xs font-semibold uppercase tracking-wider text-on-surface-variant">รายละเอียด</p>
+      <div class="flex gap-3">
+        <div class="flex-1"><label class="block text-xs text-on-surface-variant mb-1">จำนวน</label><input id="withdraw-qty" type="number" value="1" min="1" class="w-full px-3 py-2.5 bg-surface-container-low rounded-xl text-sm text-center font-bold border-0 focus:ring-2 focus:ring-primary outline-none"/></div>
+        <div class="flex-1"><label class="block text-xs text-on-surface-variant mb-1">หน่วย</label><input id="withdraw-unit" type="text" class="w-full px-3 py-2.5 bg-surface-container-low rounded-xl text-sm border-0 outline-none" readonly/></div>
+      </div>
+      <div><label class="block text-xs text-on-surface-variant mb-1">หมายเหตุ</label><input id="withdraw-note" type="text" placeholder="เช่น ทำอาหารเด็กและครู" class="w-full px-3 py-2.5 bg-surface-container-low rounded-xl text-sm border-0 focus:ring-2 focus:ring-primary outline-none"/></div>
+    </div>
+    <button onclick="submitWithdraw()" class="w-full py-4 rounded-xl font-headline font-bold text-white active:scale-95 transition-transform" style="background:linear-gradient(135deg,#004786,#00539a);box-shadow:0 4px 16px rgba(0,71,134,0.25)">ยืนยันการเบิก</button>
+  </section>
+
+  <section id="tab-members" class="hidden px-4 pt-4">
+    <h1 class="font-headline text-2xl font-extrabold text-on-surface mb-4">บุคลากร</h1>
+    <div id="member-list" class="space-y-3"><div class="text-center text-on-surface-variant text-sm py-12">กำลังโหลด...</div></div>
+  </section>
+
+  <section id="tab-admin" class="hidden px-4 pt-4">
+    <h1 class="font-headline text-2xl font-extrabold text-on-surface mb-4">จัดการระบบ</h1>
+    <div class="grid grid-cols-2 gap-3">
+      <div class="bg-white rounded-2xl p-4 flex flex-col gap-2" style="box-shadow:0 4px 16px rgba(25,28,33,0.06)"><span class="material-symbols-outlined text-primary text-2xl">add_box</span><p class="text-sm font-semibold text-on-surface">เพิ่มสินค้า</p></div>
+      <div class="bg-white rounded-2xl p-4 flex flex-col gap-2" style="box-shadow:0 4px 16px rgba(25,28,33,0.06)"><span class="material-symbols-outlined text-primary text-2xl">person_add</span><p class="text-sm font-semibold text-on-surface">เพิ่มบุคลากร</p></div>
+      <div class="bg-white rounded-2xl p-4 flex flex-col gap-2" style="box-shadow:0 4px 16px rgba(25,28,33,0.06)"><span class="material-symbols-outlined text-primary text-2xl">qr_code</span><p class="text-sm font-semibold text-on-surface">พิมพ์ QR Code</p></div>
+      <div class="bg-white rounded-2xl p-4 flex flex-col gap-2" style="box-shadow:0 4px 16px rgba(25,28,33,0.06)"><span class="material-symbols-outlined text-primary text-2xl">summarize</span><p class="text-sm font-semibold text-on-surface">ออกรายงาน</p></div>
+    </div>
+  </section>
+
+  <nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-2 pt-2 bg-white/90 backdrop-blur-xl rounded-t-2xl z-50" style="box-shadow:0 -4px 20px rgba(25,28,33,0.08);padding-bottom:max(16px,env(safe-area-inset-bottom))">
+    <button onclick="switchTab('inventory')" id="nav-inventory" class="nav-btn flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl bg-primary-fixed active:scale-90 transition-transform">
+      <span class="material-symbols-outlined fill-icon text-primary" style="font-size:22px">inventory_2</span>
+      <span class="text-[10px] font-semibold text-primary">คลัง</span>
+    </button>
+    <button onclick="switchTab('history')" id="nav-history" class="nav-btn flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl active:scale-90 transition-transform">
+      <span class="material-symbols-outlined text-on-surface-variant" style="font-size:22px">history</span>
+      <span class="text-[10px] font-semibold text-on-surface-variant">ประวัติ</span>
+    </button>
+    <button onclick="switchTab('withdraw')" class="w-14 h-14 rounded-full flex items-center justify-center -mt-5 active:scale-90 transition-transform" style="background:linear-gradient(135deg,#004786,#00539a);box-shadow:0 4px 16px rgba(0,71,134,0.4)">
+      <span class="material-symbols-outlined text-white text-2xl">output</span>
+    </button>
+    <button onclick="switchTab('members')" id="nav-members" class="nav-btn flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl active:scale-90 transition-transform">
+      <span class="material-symbols-outlined text-on-surface-variant" style="font-size:22px">group</span>
+      <span class="text-[10px] font-semibold text-on-surface-variant">บุคลากร</span>
+    </button>
+    <button onclick="switchTab('admin')" id="nav-admin" class="nav-btn flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl active:scale-90 transition-transform">
+      <span class="material-symbols-outlined text-on-surface-variant" style="font-size:22px">admin_panel_settings</span>
+      <span class="text-[10px] font-semibold text-on-surface-variant">จัดการ</span>
+    </button>
+  </nav>
+</div>
+
+<div id="qr-panel" class="panel-overlay fixed inset-0 z-50 flex items-end" style="background:rgba(0,0,0,0.5)">
+  <div class="panel-sheet w-full bg-white rounded-t-2xl p-6">
+    <div class="w-10 h-1 bg-outline-variant rounded-full mx-auto mb-5"></div>
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="font-headline font-bold text-lg">สแกน QR Code</h2>
+      <button onclick="closeQR()" class="w-8 h-8 bg-surface-container rounded-full flex items-center justify-center"><span class="material-symbols-outlined text-on-surface-variant text-lg">close</span></button>
+    </div>
+    <div class="aspect-square bg-surface-container rounded-2xl flex flex-col items-center justify-center gap-3 mb-4 relative">
+      <div class="absolute top-4 left-4 w-6 h-6 border-t-2 border-l-2 border-primary rounded-tl-lg"></div>
+      <div class="absolute top-4 right-4 w-6 h-6 border-t-2 border-r-2 border-primary rounded-tr-lg"></div>
+      <div class="absolute bottom-4 left-4 w-6 h-6 border-b-2 border-l-2 border-primary rounded-bl-lg"></div>
+      <div class="absolute bottom-4 right-4 w-6 h-6 border-b-2 border-r-2 border-primary rounded-br-lg"></div>
+      <span class="material-symbols-outlined text-on-surface-variant text-5xl">qr_code_scanner</span>
+      <p class="text-sm text-on-surface-variant">ต้องการ HTTPS + กล้อง</p>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="fixed bottom-24 left-4 right-4 z-50 flex items-center gap-3 rounded-2xl px-4 py-3 pointer-events-none mx-auto" style="max-width:420px;background:#191c21;color:#fff">
+  <span id="toast-icon" class="material-symbols-outlined fill-icon text-lg flex-shrink-0">check_circle</span>
+  <p id="toast-msg" class="text-sm font-medium flex-1">สำเร็จ</p>
+</div>
+
+<script>
+const SUPABASE_URL='https://nyzkwpzndzoyzchewrlt.supabase.co'
+const SUPABASE_ANON='sb_publishable_cf7NpV4z6jc7YyiDcXxTpw_ihoVQzld'
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_ANON)
+let itemsData=[],membersData=[],currentFilter='all',searchQuery=''
+
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'))
+  document.getElementById('page-'+id).classList.add('active')
+  if(id==='app')loadAll()
+  if(id==='login')sb.auth.signOut()
+}
+
+const tabTitles={inventory:'คลังสินค้า',history:'ประวัติการเบิก',withdraw:'เบิกของ',members:'บุคลากร',admin:'จัดการระบบ'}
+function switchTab(tab){
+  document.querySelectorAll('[id^="tab-"]').forEach(t=>t.classList.add('hidden'))
+  document.getElementById('tab-'+tab).classList.remove('hidden')
+  document.querySelectorAll('.nav-btn').forEach(b=>{
+    b.classList.remove('bg-primary-fixed')
+    const icon=b.querySelector('span.material-symbols-outlined')
+    if(icon){icon.classList.remove('text-primary');icon.classList.add('text-on-surface-variant')}
+    const lbl=b.querySelectorAll('span')[1]
+    if(lbl){lbl.classList.remove('text-primary');lbl.classList.add('text-on-surface-variant')}
+  })
+  const ab=document.getElementById('nav-'+tab)
+  if(ab){
+    ab.classList.add('bg-primary-fixed')
+    const icon=ab.querySelector('span.material-symbols-outlined')
+    if(icon){icon.classList.add('text-primary');icon.classList.remove('text-on-surface-variant')}
+    const lbl=ab.querySelectorAll('span')[1]
+    if(lbl){lbl.classList.add('text-primary');lbl.classList.remove('text-on-surface-variant')}
+  }
+  document.getElementById('nav-title').textContent=tabTitles[tab]||'Stock Zero'
+  if(tab==='history')loadHistory()
+  if(tab==='members')loadMembers()
+}
+
+async function login(){
+  const email=document.getElementById('login-email').value.trim()
+  const pass=document.getElementById('login-password').value
+  if(!email||!pass){showToast('กรุณากรอก email และรหัสผ่าน','error');return}
+  showToast('กำลังเข้าสู่ระบบ...','hourglass_empty')
+  const{data,error}=await sb.auth.signInWithPassword({email,password:pass})
+  if(error){showToast('Login ไม่สำเร็จ: '+error.message,'error');return}
+  document.getElementById('user-initials').textContent=email.slice(0,2).toUpperCase()
+  showPage('app')
+}
+
+async function loadAll(){await loadItems()}
+
+async function loadItems(){
+  document.getElementById('item-grid').innerHTML='<div class="col-span-2 text-center text-on-surface-variant text-sm py-12">กำลังโหลด...</div>'
+  const{data,error}=await sb.from('items').select('*').order('code')
+  if(error){showToast('โหลดสินค้าไม่สำเร็จ','error');return}
+  itemsData=data||[]
+  document.getElementById('stat-asset').textContent=itemsData.filter(i=>i.item_type==='asset').length
+  document.getElementById('stat-supply').textContent=itemsData.filter(i=>i.item_type==='supply').length
+  const today=new Date();today.setHours(0,0,0,0)
+  const{count}=await sb.from('withdrawals').select('*',{count:'exact',head:true}).gte('withdrawn_at',today.toISOString())
+  document.getElementById('stat-today').textContent=count||0
+  const{data:mData}=await sb.from('members').select('*').order('id')
+  membersData=mData||[]
+  const sel=document.getElementById('withdraw-member')
+  sel.innerHTML='<option value="">— เลือกบุคลากร —</option>'+membersData.map(m=>`<option value="${m.id}">${m.name} (${m.id})</option>`).join('')
+  renderGrid()
+}
+
+function renderGrid(){
+  const grid=document.getElementById('item-grid')
+  const filtered=itemsData.filter(item=>{
+    const matchType=currentFilter==='all'||item.item_type===currentFilter
+    const q=searchQuery.toLowerCase()
+    return(!q||item.name.toLowerCase().includes(q)||item.code.toLowerCase().includes(q)||(item.category||'').toLowerCase().includes(q))&&matchType
+  })
+  if(filtered.length===0){grid.innerHTML='<div class="col-span-2 text-center text-on-surface-variant text-sm py-12">ไม่พบรายการ</div>';return}
+  const maxQty=50
+  grid.innerHTML=filtered.map(item=>{
+    const isAsset=item.item_type==='asset'
+    const isOut=item.qty===0
+    const isLow=item.qty>0&&item.qty<=5
+    const pct=Math.min(100,Math.round((item.qty/maxQty)*100))
+    const barColor=isOut?'background:#ba1a1a':isLow?'background:#753400':'background:#004786'
+    const statusBadge=isOut?'<span class="bg-error-container text-on-error-container text-[10px] font-bold px-2 py-0.5 rounded-full">หมด</span>':isLow?'<span class="bg-tertiary-fixed text-on-tertiary-fixed-variant text-[10px] font-bold px-2 py-0.5 rounded-full">ใกล้หมด</span>':'<span class="bg-secondary-container text-on-secondary-container text-[10px] font-bold px-2 py-0.5 rounded-full">ปกติ</span>'
+    const typeBadge=isAsset?'<span class="bg-secondary-container text-on-secondary-container text-[10px] font-bold px-2 py-1 rounded-md">ทรัพย์สิน</span>':'<span class="text-[10px] font-bold px-2 py-1 rounded-md" style="background:#ffdbc9;color:#753400">ของเบิก</span>'
+    const qtyColor=isOut?'color:#ba1a1a':isLow?'color:#753400':''
+    const short=item.name.slice(0,3)
+    const imgEl=item.image_url?`<img src="${item.image_url}" class="w-full h-full object-cover" loading="lazy" onerror="this.outerHTML='<div class=\\"w-full h-full flex items-center justify-center font-headline font-bold text-2xl text-on-surface-variant\\">${short}</div>'">`:`<div class="w-full h-full flex items-center justify-center font-headline font-bold text-2xl text-on-surface-variant">${short}</div>`
+    return`<div class="bg-surface-container-lowest rounded-xl overflow-hidden active:scale-95 transition-transform fade-in" style="box-shadow:0 4px 20px rgba(25,28,33,0.06)"><div class="aspect-square bg-surface-container relative ${isOut?'grayscale':''}">${imgEl}<div class="absolute top-2 left-2">${typeBadge}</div></div><div class="p-3"><h3 class="font-headline text-xs font-bold text-on-surface leading-snug mb-1 line-clamp-2">${item.name}</h3><p class="text-on-surface-variant text-[10px] mb-2">${item.code} · ${item.category||'—'}</p><div class="flex items-end justify-between"><div><span class="font-headline text-lg font-extrabold" style="${qtyColor}">${item.qty}</span><span class="text-on-surface-variant text-[10px] font-semibold ml-0.5">${item.unit||''}</span></div>${statusBadge}</div></div><div class="h-1 w-full bg-surface-variant"><div class="h-full transition-all" style="${barColor};width:${pct}%"></div></div></div>`
+  }).join('')
+}
+
+function filterType(type){
+  currentFilter=type
+  document.querySelectorAll('[id^="ftab-"]').forEach(b=>{b.classList.remove('bg-primary','text-white');b.classList.add('bg-surface-container','text-on-surface-variant')})
+  const btn=document.getElementById('ftab-'+type)
+  if(btn){btn.classList.add('bg-primary','text-white');btn.classList.remove('bg-surface-container','text-on-surface-variant')}
+  renderGrid()
+}
+
+function toggleSearch(){
+  const bar=document.getElementById('search-bar')
+  bar.classList.toggle('hidden')
+  if(!bar.classList.contains('hidden'))document.getElementById('search-input').focus()
+  else{searchQuery='';renderGrid()}
+}
+function filterItems(){searchQuery=document.getElementById('search-input').value;renderGrid()}
+
+async function loadHistory(){
+  document.getElementById('history-list').innerHTML='<div class="text-center text-on-surface-variant text-sm py-12">กำลังโหลด...</div>'
+  const{data}=await sb.from('withdrawals').select('id,qty,withdrawn_at,note,members(name),items(name,unit)').order('withdrawn_at',{ascending:false}).limit(50)
+  if(!data||data.length===0){document.getElementById('history-list').innerHTML='<div class="text-center text-on-surface-variant text-sm py-12">ยังไม่มีประวัติ</div>';return}
+  document.getElementById('history-list').innerHTML=data.map(h=>{
+    const d=new Date(h.withdrawn_at)
+    const ds=`${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()-543} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`
+    return`<div class="bg-white rounded-2xl p-4 fade-in" style="box-shadow:0 4px 12px rgba(25,28,33,0.06)"><div class="flex justify-between gap-2"><div class="flex-1 min-w-0"><p class="font-semibold text-sm text-on-surface truncate">${h.items?.name||'—'}</p><p class="text-xs text-on-surface-variant mt-0.5">${h.members?.name||'—'} · ${ds}</p>${h.note?`<p class="text-xs text-on-surface-variant italic mt-0.5">"${h.note}"</p>`:''}</div><div class="text-right flex-shrink-0"><p class="font-headline font-bold text-sm">${h.qty} ${h.items?.unit||''}</p><p class="text-[10px] font-mono text-outline">#${h.id.slice(0,6)}</p></div></div></div>`
+  }).join('')
+}
+
+async function loadMembers(){
+  const{data}=await sb.from('members').select('*').order('id')
+  if(!data)return
+  membersData=data
+  const colors=['bg-primary-fixed text-primary','bg-secondary-container text-on-secondary-container']
+  document.getElementById('member-list').innerHTML=data.map((m,i)=>`<div class="bg-white rounded-2xl p-4 flex items-center gap-3 fade-in" style="box-shadow:0 4px 12px rgba(25,28,33,0.06)"><div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 font-headline font-bold text-xs ${colors[i%2]}">${m.name.slice(0,2)}</div><div class="flex-1 min-w-0"><p class="font-semibold text-sm text-on-surface truncate">${m.name}</p><p class="text-xs text-on-surface-variant">${m.id} · ${m.role||''}</p></div>${(m.role||'').includes('admin')?'<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary-fixed text-primary flex-shrink-0">admin</span>':''}</div>`).join('')
+}
+
+function lookupItem(code){
+  const item=itemsData.find(i=>i.code===code||i.name.includes(code))
+  const preview=document.getElementById('item-preview')
+  document.getElementById('withdraw-unit').value=''
+  if(!item){preview.classList.add('hidden');return}
+  const isAsset=item.item_type==='asset'
+  preview.classList.remove('hidden')
+  preview.style.background=isAsset?'#dbeafe':'#dcfce7'
+  preview.innerHTML=`<div class="w-10 h-10 rounded-lg flex-shrink-0 overflow-hidden bg-surface-container flex items-center justify-center">${item.image_url?`<img src="${item.image_url}" class="w-full h-full object-cover">`:`<span class="font-bold text-xs text-on-surface-variant">${item.name.slice(0,3)}</span>`}</div><div class="flex-1 min-w-0"><p class="font-semibold text-sm truncate">${item.name}</p><p class="text-xs opacity-70">${item.code} · คงเหลือ ${item.qty} ${item.unit||''}</p></div>`
+  document.getElementById('withdraw-unit').value=item.unit||''
+}
+
+async function submitWithdraw(){
+  const memberId=document.getElementById('withdraw-member').value
+  const code=document.getElementById('withdraw-code').value.trim()
+  const qty=parseInt(document.getElementById('withdraw-qty').value||'1')
+  const note=document.getElementById('withdraw-note').value
+  if(!memberId){showToast('กรุณาเลือกผู้เบิก','error');return}
+  if(!code){showToast('กรุณากรอกรหัสสินค้า','error');return}
+  const item=itemsData.find(i=>i.code===code||i.name.includes(code))
+  if(!item){showToast('ไม่พบสินค้า','error');return}
+  if(item.qty<qty){showToast(`สินค้าไม่พอ มีเพียง ${item.qty} ${item.unit}`,'error');return}
+  showToast('กำลังบันทึก...','hourglass_empty')
+  const{error}=await sb.rpc('withdraw_item',{p_member_id:memberId,p_item_id:item.id,p_qty:qty,p_approver_email:item.approver_email||null,p_note:note,p_branch:'บ้านศรีนครินทร์'})
+  if(error){showToast('เบิกไม่สำเร็จ: '+error.message,'error');return}
+  showToast('บันทึกการเบิกสำเร็จ ✓','check_circle')
+  await loadItems()
+  setTimeout(()=>switchTab('history'),1200)
+}
+
+function openQR(){document.getElementById('qr-panel').classList.add('open')}
+function closeQR(){document.getElementById('qr-panel').classList.remove('open')}
+
+function showToast(msg,icon='check_circle'){
+  document.getElementById('toast-msg').textContent=msg
+  document.getElementById('toast-icon').textContent=icon
+  const t=document.getElementById('toast')
+  t.classList.add('show')
+  setTimeout(()=>t.classList.remove('show'),2800)
+}
+
+document.addEventListener('DOMContentLoaded',async()=>{
+  document.getElementById('qr-panel').addEventListener('click',e=>{if(e.target===e.currentTarget)closeQR()})
+  const{data:{session}}=await sb.auth.getSession()
+  if(session){
+    document.getElementById('user-initials').textContent=session.user.email.slice(0,2).toUpperCase()
+    showPage('app')
+  }
+})
+</script>
+</body>
+</html>
