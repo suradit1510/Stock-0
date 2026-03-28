@@ -168,7 +168,11 @@ h1,h2,h3,h4{font-family:'Manrope',sans-serif}
         </div>
 
         <!-- Category Filter -->
-        <div id="cat-filter" style="display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;margin-bottom:16px;scrollbar-width:none;-ms-overflow-style:none"></div>
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+          <select id="cat-filter" onchange="filterCat(this.value)" style="padding:8px 14px;border-radius:10px;border:1.5px solid #e1e2e9;background:white;font-size:13px;font-family:Inter,sans-serif;color:#191c21;outline:none;cursor:pointer;min-width:160px">
+            <option value="all">ทุกหมวด</option>
+          </select>
+        </div>
 
         <!-- Grid -->
         <div id="item-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px">
@@ -505,26 +509,25 @@ function filterType(t){
 
 function filterCat(cat){
   currentCat=cat
-  document.querySelectorAll('[id^="cftab-"]').forEach(function(b){b.style.background='#e7e8ef';b.style.color='#414751'})
-  var btn=document.getElementById('cftab-'+cat)
-  if(btn){btn.style.background='#004786';btn.style.color='white'}
   renderGrid()
 }
 
 function buildCatFilter(){
   var cats=['all']
   itemsData.forEach(function(item){if(item.category&&cats.indexOf(item.category)<0)cats.push(item.category)})
-  var container=document.getElementById('cat-filter')
-  if(!container)return
-  container.innerHTML=''
+  cats.sort(function(a,b){return a==='all'?-1:b==='all'?1:a.localeCompare(b,'th')})
+  var sel=document.getElementById('cat-filter')
+  if(!sel)return
+  var prev=sel.value||'all'
+  sel.innerHTML='<option value="all">ทุกหมวด</option>'
   cats.forEach(function(cat){
-    var btn=document.createElement('button')
-    btn.id='cftab-'+cat
-    btn.textContent=cat==='all'?'ทุกหมวด':cat
-    btn.style.cssText='padding:6px 14px;border-radius:20px;border:none;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;margin-right:2px;'+(cat==='all'?'background:#004786;color:white':'background:#e7e8ef;color:#414751')
-    btn.onclick=function(){filterCat(cat)}
-    container.appendChild(btn)
+    if(cat==='all')return
+    var opt=document.createElement('option')
+    opt.value=cat
+    opt.textContent=cat
+    sel.appendChild(opt)
   })
+  sel.value=prev
 }
 
 function filterItems(){
