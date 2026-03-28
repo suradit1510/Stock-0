@@ -168,8 +168,8 @@ h1,h2,h3,h4{font-family:'Manrope',sans-serif}
         </div>
 
         <!-- Grid -->
-        <div id="item-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:20px">
-          <div style="grid-column:1/-1;text-align:center;color:#414751;padding:60px">กำลังโหลด...</div>
+        <div id="item-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px">
+          <div style="grid-column:span 4;text-align:center;color:#414751;padding:60px">กำลังโหลด...</div>
         </div>
       </div>
 
@@ -308,7 +308,7 @@ function showTab(tab){
 
 // ── ITEMS ──────────────────────────────────
 async function loadItems(){
-  document.getElementById('item-grid').innerHTML='<div style="grid-column:1/-1;text-align:center;color:#414751;padding:60px">กำลังโหลด...</div>'
+  document.getElementById('item-grid').innerHTML='<div style="grid-column:span 4;text-align:center;color:#414751;padding:60px">กำลังโหลด...</div>'
   const{data,error}=await sb.from('items').select('*').order('code')
   if(error){showToast('โหลดสินค้าไม่สำเร็จ','error');return}
   itemsData=data||[]
@@ -341,11 +341,9 @@ function renderGrid(){
     var badge=isAsset
       ?'<span style="background:#dbeafe;color:#1d4ed8;font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px">ทรัพย์สิน</span>'
       :'<span style="background:#ffdbc9;color:#753400;font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px">ของเบิก</span>'
-    var status=isOut
-      ?'<span style="font-size:11px;font-weight:600;color:#ba1a1a">● หมดแล้ว</span>'
-      :isLow
-      ?'<span style="font-size:11px;font-weight:600;color:#753400">● ใกล้หมด</span>'
-      :'<span style="font-size:11px;font-weight:600;color:#004786">● ปกติ</span>'
+    var statusColor=isOut?'#ba1a1a':isLow?'#753400':'#004786'
+    var statusText=isOut?'● หมดแล้ว':isLow?'● ใกล้หมด':'● ปกติ'
+    var status='<span style="font-size:11px;font-weight:600;color:'+statusColor+'">'+statusText+'</span>'
     var card=document.createElement('div')
     card.className='card-hover fade-in'
     card.style.cssText='background:white;border-radius:14px;overflow:hidden;box-shadow:0 1px 6px rgba(25,28,33,0.08)'
@@ -371,14 +369,34 @@ function renderGrid(){
     }
     var badgeDiv=document.createElement('div')
     badgeDiv.style.cssText='position:absolute;top:10px;left:10px'
-    badgeDiv.innerHTML=badge
+    var badgeSpan=document.createElement('span')
+    if(isAsset){
+      badgeSpan.style.cssText='background:#dbeafe;color:#1d4ed8;font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px'
+      badgeSpan.textContent='ทรัพย์สิน'
+    } else {
+      badgeSpan.style.cssText='background:#ffdbc9;color:#753400;font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px'
+      badgeSpan.textContent='ของเบิก'
+    }
+    badgeDiv.appendChild(badgeSpan)
     imgDiv.appendChild(badgeDiv)
     card.appendChild(imgDiv)
     var infoDiv=document.createElement('div')
     infoDiv.style.cssText='padding:14px'
-    infoDiv.innerHTML='<p style="font-size:10px;color:#414751;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px">'+item.code+'</p>'
-      +'<h4 style="font-family:Manrope,sans-serif;font-weight:700;font-size:14px;color:#191c21;margin-bottom:6px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">'+item.name+'</h4>'
-      +'<div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#414751"><span>'+(item.category||'—')+'</span>'+status+'</div>'
+    var codeEl=document.createElement('p')
+    codeEl.style.cssText='font-size:10px;color:#414751;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px'
+    codeEl.textContent=item.code
+    infoDiv.appendChild(codeEl)
+    var nameEl=document.createElement('h4')
+    nameEl.style.cssText='font-family:Manrope,sans-serif;font-weight:700;font-size:14px;color:#191c21;margin-bottom:6px;line-height:1.4;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical'
+    nameEl.textContent=item.name
+    infoDiv.appendChild(nameEl)
+    var rowEl=document.createElement('div')
+    rowEl.style.cssText='display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#414751'
+    var catEl=document.createElement('span')
+    catEl.textContent=item.category||'—'
+    rowEl.appendChild(catEl)
+    rowEl.innerHTML+=status
+    infoDiv.appendChild(rowEl)
     card.appendChild(infoDiv)
     var barWrap=document.createElement('div')
     barWrap.style.cssText='height:3px;background:#f2f3fb'
