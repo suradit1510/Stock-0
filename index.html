@@ -167,6 +167,9 @@ h1,h2,h3,h4{font-family:'Manrope',sans-serif}
           </div>
         </div>
 
+        <!-- Category Filter -->
+        <div id="cat-filter" style="display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;margin-bottom:16px;scrollbar-width:none;-ms-overflow-style:none"></div>
+
         <!-- Grid -->
         <div id="item-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px">
           <div style="grid-column:span 4;text-align:center;color:#414751;padding:60px">กำลังโหลด...</div>
@@ -320,6 +323,7 @@ async function loadItems(){
   const{data:mData}=await sb.from('members').select('*').order('id')
   const sel=document.getElementById('withdraw-member')
   sel.innerHTML='<option value="">— เลือกบุคลากร —</option>'+(mData||[]).map(m=>'<option value="'+m.id+'">'+m.name+' ('+m.id+')</option>').join('')
+  buildCatFilter()
   renderGrid()
 }
 
@@ -327,8 +331,9 @@ function renderGrid(){
   const grid=document.getElementById('item-grid')
   const filtered=itemsData.filter(function(item){
     var matchType=currentFilter==='all'||item.item_type===currentFilter
+    var matchCat=currentCat==='all'||item.category===currentCat
     var q=searchQuery.toLowerCase()
-    return(!q||item.name.toLowerCase().includes(q)||item.code.toLowerCase().includes(q)||(item.category||'').toLowerCase().includes(q))&&matchType
+    return(!q||item.name.toLowerCase().includes(q)||item.code.toLowerCase().includes(q)||(item.category||'').toLowerCase().includes(q))&&matchType&&matchCat
   })
   if(!filtered.length){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;color:#414751;padding:60px">ไม่พบรายการ</div>';return}
   grid.innerHTML=''
@@ -341,9 +346,9 @@ function renderGrid(){
     var badge=isAsset
       ?'<span style="background:#dbeafe;color:#1d4ed8;font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px">ทรัพย์สิน</span>'
       :'<span style="background:#ffdbc9;color:#753400;font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px">ของเบิก</span>'
-    var statusColor=isOut?'#ba1a1a':isLow?'#753400':'#004786'
-    var statusText=isOut?'● หมดแล้ว':isLow?'● ใกล้หมด':'● ปกติ'
-    var status='<span style="font-size:11px;font-weight:600;color:'+statusColor+'">'+statusText+'</span>'
+    var statusColor=isOut?'#ba1a1a':'#191c21'
+    var statusText=isOut?'หมด':item.qty+' '+(item.unit||'')
+    var status='<span style="font-size:13px;font-weight:700;color:'+statusColor+';font-family:Manrope,sans-serif">'+statusText+'</span>'
     var card=document.createElement('div')
     card.className='card-hover fade-in'
     card.style.cssText='background:white;border-radius:14px;overflow:hidden;box-shadow:0 1px 6px rgba(25,28,33,0.08)'
@@ -485,6 +490,46 @@ async function submitWithdraw(){
   showToast('บันทึกการเบิกสำเร็จ ✓','check_circle')
   await loadItems()
   setTimeout(()=>showTab('history'),1500)
+}
+
+// ── FILTERS ───────────────────────────────
+var currentCat='all'
+
+function filterType(t){
+  currentFilter=t
+  document.querySelectorAll('[id^="ftab-"]').forEach(function(b){b.style.color='#414751';b.style.borderBottomColor='transparent';b.style.fontWeight='600'})
+  var btn=document.getElementById('ftab-'+t)
+  if(btn){btn.style.color='#1d4ed8';btn.style.borderBottomColor='#1d4ed8';btn.style.fontWeight='700'}
+  renderGrid()
+}
+
+function filterCat(cat){
+  currentCat=cat
+  document.querySelectorAll('[id^="cftab-"]').forEach(function(b){b.style.background='#e7e8ef';b.style.color='#414751'})
+  var btn=document.getElementById('cftab-'+cat)
+  if(btn){btn.style.background='#004786';btn.style.color='white'}
+  renderGrid()
+}
+
+function buildCatFilter(){
+  var cats=['all']
+  itemsData.forEach(function(item){if(item.category&&cats.indexOf(item.category)<0)cats.push(item.category)})
+  var container=document.getElementById('cat-filter')
+  if(!container)return
+  container.innerHTML=''
+  cats.forEach(function(cat){
+    var btn=document.createElement('button')
+    btn.id='cftab-'+cat
+    btn.textContent=cat==='all'?'ทุกหมวด':cat
+    btn.style.cssText='padding:6px 14px;border-radius:20px;border:none;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;margin-right:2px;'+(cat==='all'?'background:#004786;color:white':'background:#e7e8ef;color:#414751')
+    btn.onclick=function(){filterCat(cat)}
+    container.appendChild(btn)
+  })
+}
+
+function filterItems(){
+  searchQuery=document.getElementById('search-input').value
+  renderGrid()
 }
 
 // ── TOAST ──────────────────────────────────
