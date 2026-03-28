@@ -4,380 +4,304 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
 <title>Stock Project Zero</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <script>
-tailwind.config={darkMode:"class",theme:{extend:{colors:{"tertiary-fixed":"#ffdbc9","on-tertiary-container":"#ffceb4","on-secondary-container":"#495e7f","error":"#ba1a1a","tertiary":"#753400","surface-container-lowest":"#ffffff","primary-container":"#005faf","outline":"#727783","background":"#f9f9ff","error-container":"#ffdad6","on-error-container":"#93000a","on-background":"#191c21","on-tertiary-fixed-variant":"#753400","surface":"#f9f9ff","on-secondary":"#ffffff","on-surface":"#191c21","primary-fixed":"#d4e3ff","on-surface-variant":"#414751","surface-variant":"#e1e2e9","on-primary-container":"#c4daff","secondary-container":"#c2d8fe","secondary":"#4a5f80","surface-container-low":"#f2f3fb","primary":"#004786","on-primary":"#ffffff","surface-container-highest":"#e1e2e9","outline-variant":"#c1c6d3","surface-container-high":"#e7e8ef","surface-container":"#ecedf5","secondary-fixed":"#d4e3ff","tertiary-fixed-dim":"#ffb68c"},fontFamily:{headline:["Manrope"],body:["Inter"],label:["Inter"]},borderRadius:{DEFAULT:"0.25rem",lg:"0.5rem",xl:"0.75rem",full:"9999px"}}}}
+tailwind.config={darkMode:"class",theme:{extend:{colors:{"surface-container-low":"#f2f3fb","secondary-container":"#c2d8fe","tertiary-fixed":"#ffdbc9","surface-container-high":"#e7e8ef","on-tertiary-fixed-variant":"#753400","surface-variant":"#e1e2e9","outline":"#727783","on-surface-variant":"#414751","error-container":"#ffdad6","on-background":"#191c21","surface":"#f9f9ff","surface-container-lowest":"#ffffff","on-primary-container":"#c4daff","tertiary":"#753400","surface-container":"#ecedf5","on-surface":"#191c21","on-primary":"#ffffff","background":"#f9f9ff","primary-fixed":"#d4e3ff","surface-container-highest":"#e1e2e9","primary":"#004786","on-error-container":"#93000a","error":"#ba1a1a","secondary":"#4a5f80","primary-container":"#005faf","on-secondary-container":"#495e7f","outline-variant":"#c1c6d3","on-tertiary-container":"#ffceb4","on-secondary":"#ffffff","secondary-fixed":"#d4e3ff","on-tertiary":"#ffffff","on-secondary-fixed-variant":"#324867"},fontFamily:{headline:["Manrope"],body:["Inter"],label:["Inter"]},borderRadius:{DEFAULT:"0.25rem",lg:"0.5rem",xl:"0.75rem",full:"9999px"}}}}
 </script>
 <style>
 .material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24}
 .fill-icon{font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24}
+.primary-gradient{background:linear-gradient(135deg,#005faf 0%,#004786 100%)}
+body{background-color:#f9f9ff;color:#191c21;font-family:'Inter',sans-serif}
+h1,h2,h3,h4{font-family:'Manrope',sans-serif}
 .scrollbar-hide::-webkit-scrollbar{display:none}
 .scrollbar-hide{-ms-overflow-style:none;scrollbar-width:none}
-.page{display:none}
-.page.active{display:flex}
-@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+#page-login{display:none}
+#page-app{display:none}
+.tab-section{display:none}
+#tab-inventory{display:block}
+.nav-link.active{color:#1d4ed8;background:rgba(255,255,255,0.5);font-weight:700}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 .fade-in{animation:fadeIn 0.2s ease forwards}
-#toast{transform:translateY(80px);transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1)}
-#toast.show{transform:translateY(0)}
-.panel-overlay{opacity:0;pointer-events:none;transition:opacity 0.25s}
-.panel-overlay.open{opacity:1;pointer-events:all}
-.panel-sheet{transform:translateY(100%);transition:transform 0.3s cubic-bezier(0.32,0.72,0,1)}
-.panel-overlay.open .panel-sheet{transform:translateY(0)}
-.nav-item.active{background:#e8f0fa;color:#004786}
-.nav-item.active span{color:#004786}
-
-/* Responsive grid */
-.item-grid{display:grid;gap:12px;grid-template-columns:repeat(2,1fr)}
-@media(min-width:640px){.item-grid{grid-template-columns:repeat(3,1fr)}}
-@media(min-width:1024px){.item-grid{grid-template-columns:repeat(4,1fr)}}
-
-/* Desktop layout */
-@media(min-width:768px){
-  #sidebar{display:flex !important}
-  #bottom-nav{display:none !important}
-  #mobile-header{display:none !important}
-  #desktop-header{display:flex !important}
-  #main-content{margin-left:240px}
-}
+.card-hover{transition:all 0.2s ease}
+.card-hover:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(25,28,33,0.1)}
 </style>
 </head>
-<body class="bg-background text-on-background font-body" style="height:100dvh;overflow:hidden;display:flex;flex-direction:column;">
+<body class="flex min-h-screen">
 
 <!-- ═══ LOGIN ═══ -->
-<div class="page active" id="page-login" style="min-height:100dvh;align-items:center;justify-content:center;background:linear-gradient(135deg,#f9f9ff,#e7e8ef);flex-direction:column;">
-  <div style="width:100%;max-width:400px;padding:24px;">
-    <div style="text-align:center;margin-bottom:32px;">
-      <div style="width:64px;height:64px;border-radius:16px;background:#004786;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 8px 24px rgba(0,71,134,0.25)">
-        <span class="material-symbols-outlined" style="color:white;font-size:32px">inventory_2</span>
+<div id="page-login" style="min-height:100vh;width:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#f9f9ff,#e7e8ef)">
+  <div style="width:100%;max-width:420px;padding:24px">
+    <div style="text-align:center;margin-bottom:32px">
+      <div class="primary-gradient" style="width:64px;height:64px;border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 8px 24px rgba(0,95,175,0.3)">
+        <span class="material-symbols-outlined fill-icon" style="color:white;font-size:32px">inventory_2</span>
       </div>
-      <h1 class="font-headline" style="font-size:24px;font-weight:800;color:#191c21">Stock Project Zero</h1>
-      <p style="color:#414751;font-size:14px;margin-top:4px">บ้านศรีนครินทร์</p>
+      <h1 style="font-size:26px;font-weight:800;color:#191c21;margin-bottom:4px">Stock Project Zero</h1>
+      <p style="color:#414751;font-size:14px">บ้านศรีนครินทร์</p>
     </div>
-    <div style="background:white;border-radius:20px;padding:28px;box-shadow:0 16px 40px rgba(25,28,33,0.08)">
+    <div style="background:white;border-radius:20px;padding:28px;box-shadow:0 16px 48px rgba(25,28,33,0.1)">
       <div style="margin-bottom:16px">
-        <label style="display:block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#414751;margin-bottom:6px">อีเมล</label>
+        <label style="display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#414751;margin-bottom:8px">อีเมล</label>
         <div style="position:relative">
           <span class="material-symbols-outlined" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#727783;font-size:18px">mail</span>
-          <input id="login-email" type="email" placeholder="name@example.com" style="width:100%;padding:12px 12px 12px 40px;border-radius:12px;border:none;background:#f2f3fb;font-size:14px;color:#191c21;outline:none;box-sizing:border-box"/>
+          <input id="login-email" type="email" placeholder="name@example.com" style="width:100%;padding:12px 12px 12px 40px;border-radius:12px;border:1.5px solid #e1e2e9;background:#f9f9ff;font-size:14px;color:#191c21;outline:none;box-sizing:border-box;transition:border-color 0.2s" onfocus="this.style.borderColor='#004786'" onblur="this.style.borderColor='#e1e2e9'"/>
         </div>
       </div>
       <div style="margin-bottom:24px">
-        <label style="display:block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#414751;margin-bottom:6px">รหัสผ่าน</label>
+        <label style="display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#414751;margin-bottom:8px">รหัสผ่าน</label>
         <div style="position:relative">
           <span class="material-symbols-outlined" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#727783;font-size:18px">lock</span>
-          <input id="login-password" type="password" placeholder="••••••••" style="width:100%;padding:12px 12px 12px 40px;border-radius:12px;border:none;background:#f2f3fb;font-size:14px;color:#191c21;outline:none;box-sizing:border-box"/>
+          <input id="login-password" type="password" placeholder="••••••••" style="width:100%;padding:12px 12px 12px 40px;border-radius:12px;border:1.5px solid #e1e2e9;background:#f9f9ff;font-size:14px;color:#191c21;outline:none;box-sizing:border-box;transition:border-color 0.2s" onfocus="this.style.borderColor='#004786'" onblur="this.style.borderColor='#e1e2e9'"/>
         </div>
       </div>
-      <button onclick="login()" style="width:100%;padding:14px;border-radius:12px;border:none;background:linear-gradient(135deg,#004786,#00539a);color:white;font-family:'Manrope',sans-serif;font-weight:700;font-size:15px;cursor:pointer;box-shadow:0 4px 16px rgba(0,71,134,0.3)">เข้าสู่ระบบ</button>
+      <button onclick="doLogin()" class="primary-gradient" style="width:100%;padding:14px;border-radius:12px;border:none;color:white;font-family:'Manrope',sans-serif;font-weight:700;font-size:15px;cursor:pointer;box-shadow:0 4px 16px rgba(0,71,134,0.3);transition:opacity 0.2s" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">เข้าสู่ระบบ</button>
+      <p id="login-error" style="display:none;color:#ba1a1a;font-size:13px;text-align:center;margin-top:12px"></p>
     </div>
   </div>
 </div>
 
 <!-- ═══ APP ═══ -->
-<div class="page" id="page-app" style="flex-direction:row;flex:1;overflow:hidden;height:100dvh;">
+<div id="page-app" style="display:flex;min-height:100vh;width:100%">
 
-  <!-- SIDEBAR (desktop/tablet) -->
-  <aside id="sidebar" style="display:none;width:240px;flex-shrink:0;background:white;border-right:1px solid #e7e8ef;flex-direction:column;height:100dvh;position:fixed;left:0;top:0;z-index:40;overflow-y:auto;">
-    <div style="padding:20px 16px;border-bottom:1px solid #e7e8ef;">
-      <div style="display:flex;align-items:center;gap:10px">
-        <div style="width:36px;height:36px;border-radius:10px;background:#004786;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-          <span class="material-symbols-outlined" style="color:white;font-size:18px">inventory_2</span>
-        </div>
-        <div>
-          <div class="font-headline" style="font-size:14px;font-weight:700;color:#004786">Stock Project Zero</div>
-          <div style="font-size:11px;color:#414751">บ้านศรีนครินทร์</div>
-        </div>
+  <!-- SIDEBAR -->
+  <aside style="width:260px;flex-shrink:0;background:#f2f3fb;border-right:1px solid #e1e2e9;display:flex;flex-direction:column;padding:16px;gap:4px;position:fixed;left:0;top:0;height:100vh;overflow-y:auto;z-index:40">
+    <div style="display:flex;align-items:center;gap:12px;padding:16px 12px 24px">
+      <div class="primary-gradient" style="width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 12px rgba(0,95,175,0.25)">
+        <span class="material-symbols-outlined fill-icon" style="color:white;font-size:20px">inventory_2</span>
+      </div>
+      <div>
+        <div style="font-family:'Manrope',sans-serif;font-weight:700;font-size:14px;color:#191c21">Stock Project Zero</div>
+        <div style="font-size:11px;color:#414751">บ้านศรีนครินทร์</div>
       </div>
     </div>
-    <nav style="padding:12px 8px;flex:1">
-      <button onclick="switchTab('inventory')" id="snav-inventory" class="nav-item active" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;border:none;cursor:pointer;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;color:#414751;background:transparent;text-align:left;margin-bottom:4px">
-        <span class="material-symbols-outlined fill-icon" style="font-size:20px">inventory_2</span>คลังสินค้า
-      </button>
-      <button onclick="switchTab('history')" id="snav-history" class="nav-item" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;border:none;cursor:pointer;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;color:#414751;background:transparent;text-align:left;margin-bottom:4px">
+    <nav style="flex:1;display:flex;flex-direction:column;gap:2px">
+      <a onclick="showTab('inventory')" id="nav-inventory" class="nav-link active" style="display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:10px;cursor:pointer;font-size:13px;font-weight:600;color:#414751;text-decoration:none;transition:all 0.15s">
+        <span class="material-symbols-outlined" style="font-size:20px">inventory_2</span>คลังสินค้า
+      </a>
+      <a onclick="showTab('history')" id="nav-history" class="nav-link" style="display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:10px;cursor:pointer;font-size:13px;font-weight:600;color:#414751;text-decoration:none;transition:all 0.15s">
         <span class="material-symbols-outlined" style="font-size:20px">history</span>ประวัติการเบิก
-      </button>
-      <button onclick="switchTab('withdraw')" id="snav-withdraw" class="nav-item" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;border:none;cursor:pointer;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;color:#414751;background:transparent;text-align:left;margin-bottom:4px">
+      </a>
+      <a onclick="showTab('withdraw')" id="nav-withdraw" class="nav-link" style="display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:10px;cursor:pointer;font-size:13px;font-weight:600;color:#414751;text-decoration:none;transition:all 0.15s">
         <span class="material-symbols-outlined" style="font-size:20px">output</span>เบิกของ
-      </button>
-      <button onclick="switchTab('members')" id="snav-members" class="nav-item" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;border:none;cursor:pointer;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;color:#414751;background:transparent;text-align:left;margin-bottom:4px">
+      </a>
+      <a onclick="showTab('members')" id="nav-members" class="nav-link" style="display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:10px;cursor:pointer;font-size:13px;font-weight:600;color:#414751;text-decoration:none;transition:all 0.15s">
         <span class="material-symbols-outlined" style="font-size:20px">group</span>บุคลากร
-      </button>
-      <button onclick="switchTab('admin')" id="snav-admin" class="nav-item" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;border:none;cursor:pointer;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;color:#414751;background:transparent;text-align:left;margin-bottom:4px">
+      </a>
+      <a onclick="showTab('admin')" id="nav-admin" class="nav-link" style="display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:10px;cursor:pointer;font-size:13px;font-weight:600;color:#414751;text-decoration:none;transition:all 0.15s">
         <span class="material-symbols-outlined" style="font-size:20px">admin_panel_settings</span>จัดการ
-      </button>
+      </a>
     </nav>
-    <div style="padding:12px 16px;border-top:1px solid #e7e8ef;display:flex;align-items:center;gap:10px">
-      <div style="width:32px;height:32px;border-radius:50%;background:#d4e3ff;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-        <span id="sidebar-initials" class="font-headline" style="font-size:11px;font-weight:700;color:#004786">SU</span>
-      </div>
-      <div style="flex:1;min-width:0">
-        <div id="sidebar-email" style="font-size:12px;font-weight:500;color:#191c21;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">user</div>
-      </div>
-      <button onclick="showPage('login')" style="border:none;background:none;cursor:pointer;padding:4px">
-        <span class="material-symbols-outlined" style="font-size:18px;color:#414751">logout</span>
+    <div style="border-top:1px solid #e1e2e9;padding-top:12px;margin-top:8px">
+      <button onclick="doLogout()" style="width:100%;display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:10px;border:none;background:none;cursor:pointer;font-size:13px;font-weight:600;color:#414751;font-family:'Inter',sans-serif">
+        <span class="material-symbols-outlined" style="font-size:20px">logout</span>ออกจากระบบ
       </button>
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 14px;margin-top:4px">
+        <div class="primary-gradient" style="width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <span id="user-initials" style="font-family:'Manrope',sans-serif;font-weight:700;font-size:11px;color:white">SU</span>
+        </div>
+        <span id="user-email" style="font-size:12px;color:#414751;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">user</span>
+      </div>
     </div>
   </aside>
 
-  <!-- MAIN CONTENT -->
-  <div id="main-content" style="flex:1;display:flex;flex-direction:column;overflow:hidden;height:100dvh;">
+  <!-- MAIN -->
+  <main style="flex:1;margin-left:260px;min-height:100vh;display:flex;flex-direction:column">
 
-    <!-- Mobile header -->
-    <header id="mobile-header" style="background:white;border-bottom:1px solid #e7e8ef;display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:56px;flex-shrink:0;padding-top:env(safe-area-inset-top)">
-      <div style="display:flex;align-items:center;gap:8px">
-        <span class="material-symbols-outlined" style="color:#004786;font-size:20px">inventory_2</span>
-        <span id="nav-title" class="font-headline" style="font-size:16px;font-weight:700;color:#004786">คลังสินค้า</span>
-      </div>
-      <div style="display:flex;align-items:center;gap:8px">
-        <button onclick="toggleSearch()" style="border:none;background:none;cursor:pointer;padding:6px">
-          <span class="material-symbols-outlined" style="color:#414751;font-size:20px">search</span>
-        </button>
-        <button onclick="showPage('login')" style="width:32px;height:32px;border-radius:50%;background:#d4e3ff;display:flex;align-items:center;justify-content:center;border:none;cursor:pointer">
-          <span id="user-initials" class="font-headline" style="font-size:11px;font-weight:700;color:#004786">SU</span>
-        </button>
-      </div>
-    </header>
-
-    <!-- Desktop header -->
-    <header id="desktop-header" style="display:none;background:white;border-bottom:1px solid #e7e8ef;align-items:center;justify-content:space-between;padding:0 24px;height:60px;flex-shrink:0;">
-      <h1 id="desktop-title" class="font-headline" style="font-size:18px;font-weight:700;color:#191c21">คลังสินค้า</h1>
+    <!-- TOPBAR -->
+    <header style="height:64px;border-bottom:1px solid #e1e2e9;display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:30;background:rgba(249,249,255,0.85);backdrop-filter:blur(12px)">
+      <h2 id="page-title" style="font-size:20px;font-weight:800;color:#191c21">คลังสินค้า</h2>
       <div style="display:flex;align-items:center;gap:12px">
         <div style="position:relative">
-          <span class="material-symbols-outlined" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#727783;font-size:16px">search</span>
-          <input id="search-input-desktop" oninput="filterItems()" type="text" placeholder="ค้นหาสินค้า..." style="padding:8px 16px 8px 34px;border-radius:20px;border:1px solid #e7e8ef;background:#f9f9ff;font-size:13px;width:240px;outline:none"/>
+          <span class="material-symbols-outlined" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#727783;font-size:16px">search</span>
+          <input id="search-input" oninput="filterItems()" type="text" placeholder="ค้นหาสินค้า..." style="padding:9px 16px 9px 36px;border-radius:20px;border:1.5px solid #e1e2e9;background:white;font-size:13px;width:220px;outline:none;transition:border-color 0.2s" onfocus="this.style.borderColor='#004786'" onblur="this.style.borderColor='#e1e2e9'"/>
         </div>
-        <button onclick="showPage('login')" style="display:flex;align-items:center;gap:8px;border:1px solid #e7e8ef;background:white;border-radius:20px;padding:6px 12px;cursor:pointer">
-          <div style="width:24px;height:24px;border-radius:50%;background:#d4e3ff;display:flex;align-items:center;justify-content:center">
-            <span id="desktop-initials" class="font-headline" style="font-size:9px;font-weight:700;color:#004786">SU</span>
-          </div>
-          <span style="font-size:12px;color:#414751">ออกจากระบบ</span>
-        </button>
       </div>
     </header>
 
-    <!-- Search bar (mobile) -->
-    <div id="search-bar" style="display:none;background:white;padding:8px 16px;border-bottom:1px solid #e7e8ef;">
-      <div style="position:relative">
-        <span class="material-symbols-outlined" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#727783;font-size:16px">search</span>
-        <input id="search-input" oninput="filterItems()" type="text" placeholder="ค้นหาชื่อสินค้า หรือรหัส..." style="width:100%;padding:10px 16px 10px 34px;border-radius:20px;border:none;background:#f2f3fb;font-size:13px;outline:none;box-sizing:border-box"/>
+    <!-- CONTENT -->
+    <div style="flex:1;padding:28px;overflow-y:auto">
+
+      <!-- INVENTORY TAB -->
+      <div id="tab-inventory" class="tab-section" style="display:block">
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px">
+          <div style="background:white;border-radius:14px;padding:20px;box-shadow:0 1px 4px rgba(25,28,33,0.06);border-left:4px solid #004786">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
+              <div style="padding:8px;border-radius:10px;background:#d4e3ff">
+                <span class="material-symbols-outlined fill-icon" style="color:#004786;font-size:20px">account_balance_wallet</span>
+              </div>
+              <span style="font-size:10px;font-weight:700;color:#414751;text-transform:uppercase;letter-spacing:0.06em">ทรัพย์สิน</span>
+            </div>
+            <div id="stat-asset" style="font-size:32px;font-weight:800;color:#191c21;font-family:'Manrope',sans-serif">—</div>
+          </div>
+          <div style="background:white;border-radius:14px;padding:20px;box-shadow:0 1px 4px rgba(25,28,33,0.06);border-left:4px solid #4a5f80">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
+              <div style="padding:8px;border-radius:10px;background:#c2d8fe">
+                <span class="material-symbols-outlined fill-icon" style="color:#4a5f80;font-size:20px">inventory</span>
+              </div>
+              <span style="font-size:10px;font-weight:700;color:#414751;text-transform:uppercase;letter-spacing:0.06em">ของเบิก</span>
+            </div>
+            <div id="stat-supply" style="font-size:32px;font-weight:800;color:#191c21;font-family:'Manrope',sans-serif">—</div>
+          </div>
+          <div style="background:white;border-radius:14px;padding:20px;box-shadow:0 1px 4px rgba(25,28,33,0.06);border-left:4px solid #753400">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
+              <div style="padding:8px;border-radius:10px;background:#ffdbc9">
+                <span class="material-symbols-outlined fill-icon" style="color:#753400;font-size:20px">outbox</span>
+              </div>
+              <span style="font-size:10px;font-weight:700;color:#414751;text-transform:uppercase;letter-spacing:0.06em">เบิกวันนี้</span>
+            </div>
+            <div id="stat-today" style="font-size:32px;font-weight:800;color:#191c21;font-family:'Manrope',sans-serif">—</div>
+          </div>
+        </div>
+
+        <!-- Filters -->
+        <div style="border-bottom:1px solid #e1e2e9;margin-bottom:20px;padding-bottom:0">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div style="display:flex;gap:28px">
+              <button onclick="filterType('all')" id="ftab-all" style="font-family:'Manrope',sans-serif;font-weight:700;font-size:14px;color:#1d4ed8;border:none;background:none;cursor:pointer;padding-bottom:14px;border-bottom:2px solid #1d4ed8">ทั้งหมด</button>
+              <button onclick="filterType('asset')" id="ftab-asset" style="font-family:'Manrope',sans-serif;font-weight:600;font-size:14px;color:#414751;border:none;background:none;cursor:pointer;padding-bottom:14px;border-bottom:2px solid transparent">ทรัพย์สิน</button>
+              <button onclick="filterType('supply')" id="ftab-supply" style="font-family:'Manrope',sans-serif;font-weight:600;font-size:14px;color:#414751;border:none;background:none;cursor:pointer;padding-bottom:14px;border-bottom:2px solid transparent">ของเบิก</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Grid -->
+        <div id="item-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:20px">
+          <div style="grid-column:1/-1;text-align:center;color:#414751;padding:60px">กำลังโหลด...</div>
+        </div>
       </div>
+
+      <!-- HISTORY TAB -->
+      <div id="tab-history" class="tab-section">
+        <h2 style="font-size:22px;font-weight:800;margin-bottom:20px">ประวัติการเบิก</h2>
+        <div id="history-list" style="display:flex;flex-direction:column;gap:10px;max-width:800px">
+          <div style="text-align:center;color:#414751;padding:60px">กำลังโหลด...</div>
+        </div>
+      </div>
+
+      <!-- WITHDRAW TAB -->
+      <div id="tab-withdraw" class="tab-section">
+        <h2 style="font-size:22px;font-weight:800;margin-bottom:20px">เบิกของ</h2>
+        <div style="max-width:560px;display:flex;flex-direction:column;gap:16px">
+          <div style="background:white;border-radius:16px;padding:20px;box-shadow:0 1px 4px rgba(25,28,33,0.06)">
+            <p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#414751;margin-bottom:12px">ผู้เบิก</p>
+            <select id="withdraw-member" style="width:100%;padding:11px 14px;border-radius:10px;border:1.5px solid #e1e2e9;background:#f9f9ff;font-size:14px;outline:none"><option value="">— เลือกบุคลากร —</option></select>
+          </div>
+          <div style="background:white;border-radius:16px;padding:20px;box-shadow:0 1px 4px rgba(25,28,33,0.06)">
+            <p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#414751;margin-bottom:12px">สินค้า</p>
+            <div style="margin-bottom:12px">
+              <label style="display:block;font-size:12px;color:#414751;margin-bottom:6px">รหัสสินค้า / ค้นหาชื่อ</label>
+              <input id="withdraw-code" oninput="lookupItem(this.value)" type="text" placeholder="เช่น SNR00027" style="width:100%;padding:11px 14px;border-radius:10px;border:1.5px solid #e1e2e9;background:#f9f9ff;font-size:14px;outline:none;box-sizing:border-box"/>
+            </div>
+            <div id="item-preview" style="display:none;border-radius:10px;padding:12px;background:#f0fdf4;flex-direction:row;align-items:center;gap:12px"></div>
+          </div>
+          <div style="background:white;border-radius:16px;padding:20px;box-shadow:0 1px 4px rgba(25,28,33,0.06)">
+            <p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#414751;margin-bottom:12px">รายละเอียด</p>
+            <div style="display:flex;gap:12px;margin-bottom:12px">
+              <div style="flex:1"><label style="display:block;font-size:12px;color:#414751;margin-bottom:6px">จำนวน</label><input id="withdraw-qty" type="number" value="1" min="1" style="width:100%;padding:11px;border-radius:10px;border:1.5px solid #e1e2e9;background:#f9f9ff;font-size:15px;font-weight:700;text-align:center;outline:none;box-sizing:border-box"/></div>
+              <div style="flex:1"><label style="display:block;font-size:12px;color:#414751;margin-bottom:6px">หน่วย</label><input id="withdraw-unit" type="text" style="width:100%;padding:11px;border-radius:10px;border:1.5px solid #e1e2e9;background:#f2f3fb;font-size:14px;outline:none;box-sizing:border-box" readonly/></div>
+            </div>
+            <div><label style="display:block;font-size:12px;color:#414751;margin-bottom:6px">หมายเหตุ</label><input id="withdraw-note" type="text" placeholder="เช่น ทำอาหารเด็กและครู" style="width:100%;padding:11px 14px;border-radius:10px;border:1.5px solid #e1e2e9;background:#f9f9ff;font-size:14px;outline:none;box-sizing:border-box"/></div>
+          </div>
+          <button onclick="submitWithdraw()" class="primary-gradient" style="padding:16px;border-radius:14px;border:none;color:white;font-family:'Manrope',sans-serif;font-weight:700;font-size:16px;cursor:pointer;box-shadow:0 4px 16px rgba(0,71,134,0.25)">ยืนยันการเบิก</button>
+        </div>
+      </div>
+
+      <!-- MEMBERS TAB -->
+      <div id="tab-members" class="tab-section">
+        <h2 style="font-size:22px;font-weight:800;margin-bottom:20px">บุคลากร</h2>
+        <div id="member-list" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;max-width:900px">
+          <div style="text-align:center;color:#414751;padding:60px">กำลังโหลด...</div>
+        </div>
+      </div>
+
+      <!-- ADMIN TAB -->
+      <div id="tab-admin" class="tab-section">
+        <h2 style="font-size:22px;font-weight:800;margin-bottom:20px">จัดการระบบ</h2>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;max-width:800px">
+          <div class="card-hover" style="background:white;border-radius:16px;padding:20px;box-shadow:0 1px 4px rgba(25,28,33,0.06);cursor:pointer"><span class="material-symbols-outlined" style="color:#004786;font-size:28px">add_box</span><p style="font-weight:700;margin-top:10px">เพิ่มสินค้า</p><p style="font-size:12px;color:#414751;margin-top:4px">เพิ่มรายการใหม่</p></div>
+          <div class="card-hover" style="background:white;border-radius:16px;padding:20px;box-shadow:0 1px 4px rgba(25,28,33,0.06);cursor:pointer"><span class="material-symbols-outlined" style="color:#004786;font-size:28px">person_add</span><p style="font-weight:700;margin-top:10px">เพิ่มบุคลากร</p><p style="font-size:12px;color:#414751;margin-top:4px">จัดการพนักงาน</p></div>
+          <div class="card-hover" style="background:white;border-radius:16px;padding:20px;box-shadow:0 1px 4px rgba(25,28,33,0.06);cursor:pointer"><span class="material-symbols-outlined" style="color:#004786;font-size:28px">qr_code</span><p style="font-weight:700;margin-top:10px">พิมพ์ QR</p><p style="font-size:12px;color:#414751;margin-top:4px">สร้าง QR สินค้า</p></div>
+          <div class="card-hover" style="background:white;border-radius:16px;padding:20px;box-shadow:0 1px 4px rgba(25,28,33,0.06);cursor:pointer"><span class="material-symbols-outlined" style="color:#004786;font-size:28px">summarize</span><p style="font-weight:700;margin-top:10px">ออกรายงาน</p><p style="font-size:12px;color:#414751;margin-top:4px">สรุปการเบิกจ่าย</p></div>
+        </div>
+      </div>
+
     </div>
-
-    <!-- TAB CONTENT -->
-    <div style="flex:1;overflow-y:auto;padding-bottom:80px;" id="tab-scroller">
-
-      <!-- INVENTORY -->
-      <div id="tab-inventory">
-        <div style="padding:20px 16px 12px">
-          <h2 class="font-headline" style="font-size:22px;font-weight:800;color:#191c21;margin-bottom:16px">คลังสินค้า</h2>
-          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px" id="stats-grid">
-            <div style="background:#f2f3fb;border-radius:12px;padding:14px">
-              <span class="material-symbols-outlined" style="color:#004786;font-size:18px">account_balance_wallet</span>
-              <p style="color:#414751;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin:6px 0 2px">ทรัพย์สิน</p>
-              <p id="stat-asset" class="font-headline" style="font-size:22px;font-weight:700;color:#191c21">—</p>
-            </div>
-            <div style="background:#f2f3fb;border-radius:12px;padding:14px">
-              <span class="material-symbols-outlined" style="color:#4a5f80;font-size:18px">package_2</span>
-              <p style="color:#414751;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin:6px 0 2px">ของเบิก</p>
-              <p id="stat-supply" class="font-headline" style="font-size:22px;font-weight:700;color:#191c21">—</p>
-            </div>
-            <div style="background:#f2f3fb;border-radius:12px;padding:14px">
-              <span class="material-symbols-outlined" style="color:#753400;font-size:18px">outbox</span>
-              <p style="color:#414751;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin:6px 0 2px">เบิกวันนี้</p>
-              <p id="stat-today" class="font-headline" style="font-size:22px;font-weight:700;color:#191c21">—</p>
-            </div>
-          </div>
-          <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;" class="scrollbar-hide">
-            <button onclick="filterType('all')" id="ftab-all" style="padding:8px 18px;border-radius:20px;background:#004786;color:white;border:none;font-size:12px;font-weight:600;white-space:nowrap;cursor:pointer;flex-shrink:0">ทั้งหมด</button>
-            <button onclick="filterType('asset')" id="ftab-asset" style="padding:8px 18px;border-radius:20px;background:#ecedf5;color:#414751;border:none;font-size:12px;font-weight:600;white-space:nowrap;cursor:pointer;flex-shrink:0">ทรัพย์สิน</button>
-            <button onclick="filterType('supply')" id="ftab-supply" style="padding:8px 18px;border-radius:20px;background:#ecedf5;color:#414751;border:none;font-size:12px;font-weight:600;white-space:nowrap;cursor:pointer;flex-shrink:0">ของเบิก</button>
-          </div>
-        </div>
-        <div style="padding:0 16px 16px">
-          <div id="item-grid" class="item-grid">
-            <div style="grid-column:1/-1;text-align:center;color:#414751;font-size:14px;padding:40px">กำลังโหลด...</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- HISTORY -->
-      <div id="tab-history" style="display:none;padding:20px 16px">
-        <h2 class="font-headline" style="font-size:22px;font-weight:800;color:#191c21;margin-bottom:16px">ประวัติการเบิก</h2>
-        <div id="history-list" style="display:flex;flex-direction:column;gap:10px">
-          <div style="text-align:center;color:#414751;font-size:14px;padding:40px">กำลังโหลด...</div>
-        </div>
-      </div>
-
-      <!-- WITHDRAW -->
-      <div id="tab-withdraw" style="display:none;padding:20px 16px;max-width:600px">
-        <h2 class="font-headline" style="font-size:22px;font-weight:800;color:#191c21;margin-bottom:16px">เบิกของ</h2>
-        <div style="display:flex;flex-direction:column;gap:14px">
-          <div style="background:white;border-radius:16px;padding:16px;box-shadow:0 2px 12px rgba(25,28,33,0.06)">
-            <p style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#414751;margin-bottom:10px">ผู้เบิก</p>
-            <select id="withdraw-member" style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid #e7e8ef;background:#f9f9ff;font-size:13px;outline:none"><option value="">— เลือกบุคลากร —</option></select>
-          </div>
-          <div style="background:white;border-radius:16px;padding:16px;box-shadow:0 2px 12px rgba(25,28,33,0.06)">
-            <p style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#414751;margin-bottom:10px">สินค้า</p>
-            <button onclick="openQR()" style="width:100%;border:2px dashed #c1c6d3;border-radius:10px;padding:16px;display:flex;flex-direction:column;align-items:center;gap:6px;background:#f9f9ff;cursor:pointer;margin-bottom:10px">
-              <span class="material-symbols-outlined" style="color:#727783;font-size:28px">qr_code_scanner</span>
-              <span style="font-size:13px;color:#414751">แตะสแกน QR Code</span>
-            </button>
-            <div style="margin-bottom:8px">
-              <label style="display:block;font-size:11px;color:#414751;margin-bottom:4px">รหัสสินค้า / ค้นหาชื่อ</label>
-              <input id="withdraw-code" oninput="lookupItem(this.value)" type="text" placeholder="เช่น SNR00027" style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid #e7e8ef;background:#f9f9ff;font-size:13px;outline:none;box-sizing:border-box"/>
-            </div>
-            <div id="item-preview" style="display:none;border-radius:10px;padding:10px 12px;flex-direction:row;align-items:center;gap:10px;background:#f0fdf4"></div>
-          </div>
-          <div style="background:white;border-radius:16px;padding:16px;box-shadow:0 2px 12px rgba(25,28,33,0.06)">
-            <p style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#414751;margin-bottom:10px">รายละเอียด</p>
-            <div style="display:flex;gap:10px;margin-bottom:10px">
-              <div style="flex:1"><label style="display:block;font-size:11px;color:#414751;margin-bottom:4px">จำนวน</label><input id="withdraw-qty" type="number" value="1" min="1" style="width:100%;padding:10px;border-radius:10px;border:1px solid #e7e8ef;background:#f9f9ff;font-size:14px;font-weight:700;text-align:center;outline:none;box-sizing:border-box"/></div>
-              <div style="flex:1"><label style="display:block;font-size:11px;color:#414751;margin-bottom:4px">หน่วย</label><input id="withdraw-unit" type="text" style="width:100%;padding:10px;border-radius:10px;border:1px solid #e7e8ef;background:#f9f9ff;font-size:13px;outline:none;box-sizing:border-box" readonly/></div>
-            </div>
-            <div><label style="display:block;font-size:11px;color:#414751;margin-bottom:4px">หมายเหตุ</label><input id="withdraw-note" type="text" placeholder="เช่น ทำอาหารเด็กและครู" style="width:100%;padding:10px 12px;border-radius:10px;border:1px solid #e7e8ef;background:#f9f9ff;font-size:13px;outline:none;box-sizing:border-box"/></div>
-          </div>
-          <button onclick="submitWithdraw()" style="width:100%;padding:16px;border-radius:14px;border:none;background:linear-gradient(135deg,#004786,#00539a);color:white;font-family:'Manrope',sans-serif;font-weight:700;font-size:15px;cursor:pointer;box-shadow:0 4px 16px rgba(0,71,134,0.25)">ยืนยันการเบิก</button>
-        </div>
-      </div>
-
-      <!-- MEMBERS -->
-      <div id="tab-members" style="display:none;padding:20px 16px">
-        <h2 class="font-headline" style="font-size:22px;font-weight:800;color:#191c21;margin-bottom:16px">บุคลากร</h2>
-        <div id="member-list" style="display:flex;flex-direction:column;gap:10px">
-          <div style="text-align:center;color:#414751;font-size:14px;padding:40px">กำลังโหลด...</div>
-        </div>
-      </div>
-
-      <!-- ADMIN -->
-      <div id="tab-admin" style="display:none;padding:20px 16px">
-        <h2 class="font-headline" style="font-size:22px;font-weight:800;color:#191c21;margin-bottom:16px">จัดการระบบ</h2>
-        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;max-width:600px">
-          <div style="background:white;border-radius:16px;padding:16px;box-shadow:0 2px 12px rgba(25,28,33,0.06)"><span class="material-symbols-outlined" style="color:#004786;font-size:24px">add_box</span><p style="font-size:14px;font-weight:600;color:#191c21;margin-top:8px">เพิ่มสินค้า</p></div>
-          <div style="background:white;border-radius:16px;padding:16px;box-shadow:0 2px 12px rgba(25,28,33,0.06)"><span class="material-symbols-outlined" style="color:#004786;font-size:24px">person_add</span><p style="font-size:14px;font-weight:600;color:#191c21;margin-top:8px">เพิ่มบุคลากร</p></div>
-          <div style="background:white;border-radius:16px;padding:16px;box-shadow:0 2px 12px rgba(25,28,33,0.06)"><span class="material-symbols-outlined" style="color:#004786;font-size:24px">qr_code</span><p style="font-size:14px;font-weight:600;color:#191c21;margin-top:8px">พิมพ์ QR Code</p></div>
-          <div style="background:white;border-radius:16px;padding:16px;box-shadow:0 2px 12px rgba(25,28,33,0.06)"><span class="material-symbols-outlined" style="color:#004786;font-size:24px">summarize</span><p style="font-size:14px;font-weight:600;color:#191c21;margin-top:8px">ออกรายงาน</p></div>
-        </div>
-      </div>
-
-    </div><!-- end tab-scroller -->
-
-    <!-- Mobile Bottom Nav -->
-    <nav id="bottom-nav" style="display:flex;background:white;border-top:1px solid #e7e8ef;flex-shrink:0;padding-bottom:env(safe-area-inset-bottom)">
-      <button onclick="switchTab('inventory')" id="bnav-inventory" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px;border:none;background:#e8f0fa;cursor:pointer">
-        <span class="material-symbols-outlined fill-icon" style="color:#004786;font-size:22px">inventory_2</span>
-        <span style="font-size:10px;font-weight:600;color:#004786">คลัง</span>
-      </button>
-      <button onclick="switchTab('history')" id="bnav-history" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px;border:none;background:white;cursor:pointer">
-        <span class="material-symbols-outlined" style="color:#414751;font-size:22px">history</span>
-        <span style="font-size:10px;font-weight:600;color:#414751">ประวัติ</span>
-      </button>
-      <button onclick="switchTab('withdraw')" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:0 4px 8px;border:none;background:white;cursor:pointer">
-        <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#004786,#00539a);display:flex;align-items:center;justify-content:center;margin-top:-12px;box-shadow:0 4px 16px rgba(0,71,134,0.35)">
-          <span class="material-symbols-outlined" style="color:white;font-size:22px">output</span>
-        </div>
-        <span style="font-size:10px;font-weight:600;color:#414751">เบิก</span>
-      </button>
-      <button onclick="switchTab('members')" id="bnav-members" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px;border:none;background:white;cursor:pointer">
-        <span class="material-symbols-outlined" style="color:#414751;font-size:22px">group</span>
-        <span style="font-size:10px;font-weight:600;color:#414751">บุคลากร</span>
-      </button>
-      <button onclick="switchTab('admin')" id="bnav-admin" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px;border:none;background:white;cursor:pointer">
-        <span class="material-symbols-outlined" style="color:#414751;font-size:22px">admin_panel_settings</span>
-        <span style="font-size:10px;font-weight:600;color:#414751">จัดการ</span>
-      </button>
-    </nav>
-
-  </div><!-- end main-content -->
-</div><!-- end page-app -->
-
-<!-- QR Panel -->
-<div id="qr-panel" class="panel-overlay" style="position:fixed;inset:0;z-index:50;display:flex;align-items:flex-end;background:rgba(0,0,0,0.5)">
-  <div class="panel-sheet" style="width:100%;background:white;border-radius:20px 20px 0 0;padding:24px;max-width:480px;margin:0 auto">
-    <div style="width:40px;height:4px;border-radius:2px;background:#c1c6d3;margin:0 auto 20px"></div>
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-      <h2 class="font-headline" style="font-size:18px;font-weight:700">สแกน QR Code</h2>
-      <button onclick="closeQR()" style="border:none;background:#ecedf5;border-radius:50%;width:32px;height:32px;cursor:pointer;display:flex;align-items:center;justify-content:center"><span class="material-symbols-outlined" style="font-size:18px;color:#414751">close</span></button>
-    </div>
-    <div style="aspect-ratio:1;background:#f2f3fb;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;position:relative;margin-bottom:16px">
-      <div style="position:absolute;top:16px;left:16px;width:24px;height:24px;border-top:2px solid #004786;border-left:2px solid #004786;border-radius:4px 0 0 0"></div>
-      <div style="position:absolute;top:16px;right:16px;width:24px;height:24px;border-top:2px solid #004786;border-right:2px solid #004786;border-radius:0 4px 0 0"></div>
-      <div style="position:absolute;bottom:16px;left:16px;width:24px;height:24px;border-bottom:2px solid #004786;border-left:2px solid #004786;border-radius:0 0 0 4px"></div>
-      <div style="position:absolute;bottom:16px;right:16px;width:24px;height:24px;border-bottom:2px solid #004786;border-right:2px solid #004786;border-radius:0 0 4px 0"></div>
-      <span class="material-symbols-outlined" style="color:#414751;font-size:48px">qr_code_scanner</span>
-      <p style="font-size:13px;color:#414751">ต้องการ HTTPS + กล้อง</p>
-    </div>
-  </div>
+  </main>
 </div>
 
-<!-- Toast -->
-<div id="toast" style="position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(80px);z-index:60;display:flex;align-items:center;gap:10px;background:#191c21;color:white;border-radius:14px;padding:12px 16px;pointer-events:none;min-width:200px;max-width:360px;transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1)">
+<!-- TOAST -->
+<div id="toast" style="position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(120px);z-index:100;display:flex;align-items:center;gap:10px;background:#191c21;color:white;border-radius:14px;padding:13px 20px;pointer-events:none;min-width:200px;max-width:360px;box-shadow:0 8px 24px rgba(0,0,0,0.2);transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1)">
   <span id="toast-icon" class="material-symbols-outlined fill-icon" style="font-size:18px;flex-shrink:0">check_circle</span>
-  <p id="toast-msg" style="font-size:13px;font-weight:500;flex:1">สำเร็จ</p>
+  <p id="toast-msg" style="font-size:13px;font-weight:500;flex:1;margin:0">สำเร็จ</p>
 </div>
 
 <script>
 const SUPABASE_URL='https://nyzkwpzndzoyzchewrlt.supabase.co'
 const SUPABASE_ANON='sb_publishable_cf7NpV4z6jc7YyiDcXxTpw_ihoVQzld'
 const sb=supabase.createClient(SUPABASE_URL,SUPABASE_ANON)
-let itemsData=[],membersData=[],currentFilter='all',searchQuery=''
+let itemsData=[],currentFilter='all',searchQuery=''
 
-function showPage(id){
-  document.querySelectorAll('.page').forEach(p=>p.style.display='none')
-  const p=document.getElementById('page-'+id)
-  p.style.display='flex'
-  if(id==='app')loadAll()
-  if(id==='login')sb.auth.signOut()
+// ── INIT ──────────────────────────────────
+document.addEventListener('DOMContentLoaded',async()=>{
+  const{data:{session}}=await sb.auth.getSession()
+  if(session){
+    setUserInfo(session.user.email)
+    showApp()
+  } else {
+    document.getElementById('page-login').style.display='flex'
+  }
+})
+
+// ── AUTH ──────────────────────────────────
+async function doLogin(){
+  const email=document.getElementById('login-email').value.trim()
+  const pass=document.getElementById('login-password').value
+  const errEl=document.getElementById('login-error')
+  errEl.style.display='none'
+  if(!email||!pass){errEl.textContent='กรุณากรอก email และรหัสผ่าน';errEl.style.display='block';return}
+  const{data,error}=await sb.auth.signInWithPassword({email,password:pass})
+  if(error){errEl.textContent='Login ไม่สำเร็จ: '+error.message;errEl.style.display='block';return}
+  setUserInfo(data.user.email)
+  showApp()
 }
 
+async function doLogout(){
+  await sb.auth.signOut()
+  document.getElementById('page-app').style.display='none'
+  document.getElementById('page-login').style.display='flex'
+}
+
+function setUserInfo(email){
+  const initials=email.slice(0,2).toUpperCase()
+  document.getElementById('user-initials').textContent=initials
+  document.getElementById('user-email').textContent=email
+}
+
+function showApp(){
+  document.getElementById('page-login').style.display='none'
+  document.getElementById('page-app').style.display='flex'
+  loadItems()
+}
+
+// ── NAVIGATION ────────────────────────────
 const tabTitles={inventory:'คลังสินค้า',history:'ประวัติการเบิก',withdraw:'เบิกของ',members:'บุคลากร',admin:'จัดการระบบ'}
-function switchTab(tab){
-  ['inventory','history','withdraw','members','admin'].forEach(t=>{
-    document.getElementById('tab-'+t).style.display='none'
-  })
+function showTab(tab){
+  document.querySelectorAll('.tab-section').forEach(t=>t.style.display='none')
   document.getElementById('tab-'+tab).style.display='block'
-
-  // mobile bottom nav
-  ['inventory','history','members','admin'].forEach(t=>{
-    const b=document.getElementById('bnav-'+t)
-    if(b){b.style.background='white';b.querySelector('span').style.color='#414751';if(b.querySelectorAll('span')[1])b.querySelectorAll('span')[1].style.color='#414751'}
-  })
-  const mb=document.getElementById('bnav-'+tab)
-  if(mb){mb.style.background='#e8f0fa';mb.querySelector('span').style.color='#004786';if(mb.querySelectorAll('span')[1])mb.querySelectorAll('span')[1].style.color='#004786'}
-
-  // sidebar nav
-  document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'))
-  const sb2=document.getElementById('snav-'+tab)
-  if(sb2)sb2.classList.add('active')
-
-  document.getElementById('nav-title').textContent=tabTitles[tab]||'Stock Zero'
-  document.getElementById('desktop-title').textContent=tabTitles[tab]||'Stock Zero'
-
+  document.querySelectorAll('.nav-link').forEach(n=>{n.classList.remove('active');n.style.color='#414751';n.style.background='none'})
+  const nav=document.getElementById('nav-'+tab)
+  if(nav){nav.classList.add('active');nav.style.color='#1d4ed8';nav.style.background='rgba(255,255,255,0.5)'}
+  document.getElementById('page-title').textContent=tabTitles[tab]||'Stock Zero'
   if(tab==='history')loadHistory()
   if(tab==='members')loadMembers()
 }
 
-async function login(){
-  const email=document.getElementById('login-email').value.trim()
-  const pass=document.getElementById('login-password').value
-  if(!email||!pass){showToast('กรุณากรอก email และรหัสผ่าน','error');return}
-  showToast('กำลังเข้าสู่ระบบ...','hourglass_empty')
-  const{data,error}=await sb.auth.signInWithPassword({email,password:pass})
-  if(error){showToast('Login ไม่สำเร็จ: '+error.message,'error');return}
-  const initials=email.slice(0,2).toUpperCase()
-  document.getElementById('user-initials').textContent=initials
-  document.getElementById('desktop-initials').textContent=initials
-  document.getElementById('sidebar-initials').textContent=initials
-  document.getElementById('sidebar-email').textContent=email
-  showPage('app')
-}
-
-async function loadAll(){await loadItems()}
-
+// ── ITEMS ──────────────────────────────────
 async function loadItems(){
-  document.getElementById('item-grid').innerHTML='<div style="grid-column:1/-1;text-align:center;color:#414751;font-size:14px;padding:40px">กำลังโหลด...</div>'
+  document.getElementById('item-grid').innerHTML='<div style="grid-column:1/-1;text-align:center;color:#414751;padding:60px">กำลังโหลด...</div>'
   const{data,error}=await sb.from('items').select('*').order('code')
   if(error){showToast('โหลดสินค้าไม่สำเร็จ','error');return}
   itemsData=data||[]
@@ -387,9 +311,8 @@ async function loadItems(){
   const{count}=await sb.from('withdrawals').select('*',{count:'exact',head:true}).gte('withdrawn_at',today.toISOString())
   document.getElementById('stat-today').textContent=count||0
   const{data:mData}=await sb.from('members').select('*').order('id')
-  membersData=mData||[]
   const sel=document.getElementById('withdraw-member')
-  sel.innerHTML='<option value="">— เลือกบุคลากร —</option>'+membersData.map(m=>`<option value="${m.id}">${m.name} (${m.id})</option>`).join('')
+  sel.innerHTML='<option value="">— เลือกบุคลากร —</option>'+(mData||[]).map(m=>'<option value="'+m.id+'">'+m.name+' ('+m.id+')</option>').join('')
   renderGrid()
 }
 
@@ -400,64 +323,90 @@ function renderGrid(){
     const q=searchQuery.toLowerCase()
     return(!q||item.name.toLowerCase().includes(q)||item.code.toLowerCase().includes(q)||(item.category||'').toLowerCase().includes(q))&&matchType
   })
-  if(filtered.length===0){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;color:#414751;font-size:14px;padding:40px">ไม่พบรายการ</div>';return}
-  grid.innerHTML=filtered.map(item=>{
+  if(!filtered.length){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;color:#414751;padding:60px">ไม่พบรายการ</div>';return}
+  const cards=filtered.map(item=>{
     const isAsset=item.item_type==='asset'
     const isOut=item.qty===0
     const isLow=item.qty>0&&item.qty<=5
-    const pct=Math.min(100,Math.round((item.qty/50)*100))
+    const pct=Math.min(100,Math.round(item.qty/50*100))
     const barColor=isOut?'#ba1a1a':isLow?'#753400':'#004786'
-    const statusBadge=isOut?'<span style="background:#ffdad6;color:#93000a;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px">หมด</span>':isLow?'<span style="background:#ffdbc9;color:#753400;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px">ใกล้หมด</span>':'<span style="background:#c2d8fe;color:#495e7f;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px">ปกติ</span>'
-    const typeBadge=isAsset?'<span style="background:#c2d8fe;color:#495e7f;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px">ทรัพย์สิน</span>':'<span style="background:#ffdbc9;color:#753400;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px">ของเบิก</span>'
-    const qtyColor=isOut?'#ba1a1a':isLow?'#753400':'#191c21'
+    const badge=isAsset?'<span style="background:#dbeafe;color:#1d4ed8;font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px;text-transform:uppercase">ทรัพย์สิน</span>':'<span style="background:#ffdbc9;color:#753400;font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px;text-transform:uppercase">ของเบิก</span>'
+    const status=isOut?'<span style="font-size:11px;font-weight:600;color:#ba1a1a;display:flex;align-items:center;gap:4px"><span style="width:6px;height:6px;border-radius:50%;background:#ba1a1a;display:inline-block"></span>หมดแล้ว</span>':isLow?'<span style="font-size:11px;font-weight:600;color:#753400;display:flex;align-items:center;gap:4px"><span style="width:6px;height:6px;border-radius:50%;background:#753400;display:inline-block"></span>ใกล้หมด</span>':'<span style="font-size:11px;font-weight:600;color:#004786;display:flex;align-items:center;gap:4px"><span style="width:6px;height:6px;border-radius:50%;background:#004786;display:inline-block;animation:pulse 2s infinite"></span>ปกติ</span>'
     const short=item.name.slice(0,3)
-    const imgEl=item.image_url?`<img src="${item.image_url}" style="width:100%;height:100%;object-fit:cover" loading="lazy" onerror="this.outerHTML='<div style=\\"width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:Manrope,sans-serif;font-weight:700;font-size:20px;color:#414751\\">${short}</div>'">`:`<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:Manrope,sans-serif;font-weight:700;font-size:20px;color:#414751">${short}</div>`
-    return`<div class="fade-in" style="background:white;border-radius:14px;overflow:hidden;box-shadow:0 2px 12px rgba(25,28,33,0.06);cursor:pointer;transition:transform 0.15s" onmouseenter="this.style.transform='scale(1.02)'" onmouseleave="this.style.transform='scale(1)'"><div style="aspect-ratio:1;background:#ecedf5;position:relative;${isOut?'filter:grayscale(1)':''}">${imgEl}<div style="position:absolute;top:8px;left:8px">${typeBadge}</div></div><div style="padding:10px 12px"><h3 class="font-headline" style="font-size:12px;font-weight:700;color:#191c21;line-height:1.3;margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${item.name}</h3><p style="font-size:10px;color:#414751;margin-bottom:8px">${item.code} · ${item.category||'—'}</p><div style="display:flex;align-items:flex-end;justify-content:space-between"><div><span class="font-headline" style="font-size:18px;font-weight:800;color:${qtyColor}">${item.qty}</span><span style="font-size:10px;color:#414751;margin-left:2px">${item.unit||''}</span></div>${statusBadge}</div></div><div style="height:3px;background:#e7e8ef"><div style="height:100%;background:${barColor};width:${pct}%"></div></div></div>`
-  }).join('')
+    const imgSrc=item.image_url||''
+    return '<div class="card-hover fade-in" style="background:white;border-radius:14px;overflow:hidden;box-shadow:0 1px 6px rgba(25,28,33,0.08)">'
+      +'<div style="height:180px;background:#ecedf5;position:relative;overflow:hidden'+(isOut?';filter:grayscale(0.8)':'')+'">'
+      +(imgSrc?'<img src="'+imgSrc+'" alt="'+short+'" style="width:100%;height:100%;object-fit:cover" loading="lazy" onerror="this.parentElement.innerHTML=\'<div style=\\\"width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:Manrope,sans-serif;font-weight:700;font-size:24px;color:#727783\\\">'+short+'</div>\'">'
+        :'<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:Manrope,sans-serif;font-weight:700;font-size:28px;color:#727783">'+short+'</div>')
+      +'<div style="position:absolute;top:10px;left:10px">'+badge+'</div>'
+      +'</div>'
+      +'<div style="padding:14px">'
+      +'<p style="font-size:10px;color:#414751;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px">'+item.code+'</p>'
+      +'<h4 style="font-family:Manrope,sans-serif;font-weight:700;font-size:14px;color:#191c21;margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.4">'+item.name+'</h4>'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#414751;margin-bottom:8px"><span>'+( item.category||'—')+'</span>'+status+'</div>'
+      +'</div>'
+      +'<div style="height:3px;background:#f2f3fb"><div style="height:100%;background:'+barColor+';width:'+pct+'%;transition:width 0.5s"></div></div>'
+      +'</div>'
+  })
+  grid.innerHTML=cards.join('')
 }
 
-function filterType(type){
-  currentFilter=type
-  document.querySelectorAll('[id^="ftab-"]').forEach(b=>{b.style.background='#ecedf5';b.style.color='#414751'})
-  const btn=document.getElementById('ftab-'+type)
-  if(btn){btn.style.background='#004786';btn.style.color='white'}
+function filterType(t){
+  currentFilter=t
+  document.querySelectorAll('[id^="ftab-"]').forEach(b=>{b.style.color='#414751';b.style.borderBottomColor='transparent'})
+  const btn=document.getElementById('ftab-'+t)
+  if(btn){btn.style.color='#1d4ed8';btn.style.borderBottomColor='#1d4ed8'}
   renderGrid()
-}
-
-function toggleSearch(){
-  const bar=document.getElementById('search-bar')
-  bar.style.display=bar.style.display==='none'||!bar.style.display?'block':'none'
-  if(bar.style.display==='block')document.getElementById('search-input').focus()
-  else{searchQuery='';renderGrid()}
 }
 
 function filterItems(){
-  searchQuery=(document.getElementById('search-input').value||document.getElementById('search-input-desktop').value||'')
+  searchQuery=document.getElementById('search-input').value
   renderGrid()
 }
 
+// ── HISTORY ───────────────────────────────
 async function loadHistory(){
-  document.getElementById('history-list').innerHTML='<div style="text-align:center;color:#414751;font-size:14px;padding:40px">กำลังโหลด...</div>'
+  document.getElementById('history-list').innerHTML='<div style="text-align:center;color:#414751;padding:60px">กำลังโหลด...</div>'
   const{data}=await sb.from('withdrawals').select('id,qty,withdrawn_at,note,members(name),items(name,unit)').order('withdrawn_at',{ascending:false}).limit(50)
-  if(!data||!data.length){document.getElementById('history-list').innerHTML='<div style="text-align:center;color:#414751;font-size:14px;padding:40px">ยังไม่มีประวัติ</div>';return}
+  if(!data||!data.length){document.getElementById('history-list').innerHTML='<div style="text-align:center;color:#414751;padding:60px">ยังไม่มีประวัติ</div>';return}
   document.getElementById('history-list').innerHTML=data.map(h=>{
     const d=new Date(h.withdrawn_at)
-    const ds=`${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()-543} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`
-    return`<div class="fade-in" style="background:white;border-radius:14px;padding:14px 16px;box-shadow:0 2px 12px rgba(25,28,33,0.06);display:flex;justify-content:space-between;gap:12px"><div style="flex:1;min-width:0"><p style="font-weight:600;font-size:14px;color:#191c21;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${h.items?.name||'—'}</p><p style="font-size:12px;color:#414751;margin-top:2px">${h.members?.name||'—'} · ${ds}</p>${h.note?`<p style="font-size:11px;color:#414751;font-style:italic;margin-top:2px">"${h.note}"</p>`:''}</div><div style="text-align:right;flex-shrink:0"><p class="font-headline" style="font-weight:700;font-size:14px">${h.qty} ${h.items?.unit||''}</p><p style="font-size:10px;font-family:monospace;color:#727783;margin-top:2px">#${h.id.slice(0,6)}</p></div></div>`
+    const ds=d.getDate()+'/'+(d.getMonth()+1)+'/'+(d.getFullYear()-543)+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')
+    return '<div class="fade-in" style="background:white;border-radius:14px;padding:16px 20px;box-shadow:0 1px 4px rgba(25,28,33,0.06);display:flex;justify-content:space-between;align-items:flex-start;gap:16px">'
+      +'<div style="flex:1;min-width:0">'
+      +'<p style="font-weight:700;font-size:15px;color:#191c21;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(h.items&&h.items.name||'—')+'</p>'
+      +'<p style="font-size:12px;color:#414751;margin-top:4px">'+(h.members&&h.members.name||'—')+' · '+ds+'</p>'
+      +(h.note?'<p style="font-size:12px;color:#414751;font-style:italic;margin-top:3px">"'+h.note+'"</p>':'')
+      +'</div>'
+      +'<div style="text-align:right;flex-shrink:0">'
+      +'<p style="font-family:Manrope,sans-serif;font-weight:700;font-size:15px">'+h.qty+' '+(h.items&&h.items.unit||'')+'</p>'
+      +'<p style="font-size:10px;font-family:monospace;color:#727783;margin-top:4px">#'+h.id.slice(0,6)+'</p>'
+      +'</div>'
+      +'</div>'
   }).join('')
 }
 
+// ── MEMBERS ───────────────────────────────
 async function loadMembers(){
   const{data}=await sb.from('members').select('*').order('id')
   if(!data)return
-  membersData=data
-  const colors=['#d4e3ff:#004786','#c2d8fe:#495e7f','#e8f0fa:#004786']
+  const bgs=['#d4e3ff:#004786','#c2d8fe:#4a5f80','#ffdbc9:#753400']
   document.getElementById('member-list').innerHTML=data.map((m,i)=>{
-    const[bg,fg]=colors[i%3].split(':')
-    return`<div class="fade-in" style="background:white;border-radius:14px;padding:14px 16px;box-shadow:0 2px 12px rgba(25,28,33,0.06);display:flex;align-items:center;gap:12px"><div style="width:40px;height:40px;border-radius:50%;background:${bg};display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="font-headline" style="font-size:12px;font-weight:700;color:${fg}">${m.name.slice(0,2)}</span></div><div style="flex:1;min-width:0"><p style="font-weight:600;font-size:14px;color:#191c21;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${m.name}</p><p style="font-size:12px;color:#414751;margin-top:1px">${m.id} · ${m.role||''}</p></div>${(m.role||'').includes('admin')?'<span style="background:#d4e3ff;color:#004786;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;flex-shrink:0">admin</span>':''}</div>`
+    const[bg,fg]=bgs[i%3].split(':')
+    return '<div class="fade-in" style="background:white;border-radius:14px;padding:16px;box-shadow:0 1px 4px rgba(25,28,33,0.06);display:flex;align-items:center;gap:14px">'
+      +'<div style="width:44px;height:44px;border-radius:50%;background:'+bg+';display:flex;align-items:center;justify-content:center;flex-shrink:0">'
+      +'<span style="font-family:Manrope,sans-serif;font-weight:700;font-size:13px;color:'+fg+'">'+m.name.slice(0,2)+'</span>'
+      +'</div>'
+      +'<div style="flex:1;min-width:0">'
+      +'<p style="font-weight:700;font-size:14px;color:#191c21;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+m.name+'</p>'
+      +'<p style="font-size:12px;color:#414751;margin-top:2px">'+m.id+' · '+(m.role||'')+'</p>'
+      +'</div>'
+      +((m.role||'').includes('admin')?'<span style="background:#d4e3ff;color:#004786;font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;flex-shrink:0">admin</span>':'')
+      +'</div>'
   }).join('')
 }
 
+// ── WITHDRAW ──────────────────────────────
 function lookupItem(code){
   const item=itemsData.find(i=>i.code===code||i.name.includes(code))
   const preview=document.getElementById('item-preview')
@@ -465,7 +414,14 @@ function lookupItem(code){
   if(!item){preview.style.display='none';return}
   preview.style.display='flex'
   preview.style.background=item.item_type==='asset'?'#eff6ff':'#f0fdf4'
-  preview.innerHTML=`<div style="width:40px;height:40px;border-radius:8px;overflow:hidden;background:#ecedf5;flex-shrink:0;display:flex;align-items:center;justify-content:center">${item.image_url?`<img src="${item.image_url}" style="width:100%;height:100%;object-fit:cover">`:`<span style="font-weight:700;font-size:11px;color:#414751">${item.name.slice(0,3)}</span>`}</div><div style="flex:1;min-width:0"><p style="font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${item.name}</p><p style="font-size:11px;color:#414751;margin-top:2px">${item.code} · คงเหลือ ${item.qty} ${item.unit||''}</p></div>`
+  preview.innerHTML='<div style="width:44px;height:44px;border-radius:10px;overflow:hidden;background:#ecedf5;flex-shrink:0;display:flex;align-items:center;justify-content:center">'
+    +(item.image_url?'<img src="'+item.image_url+'" style="width:100%;height:100%;object-fit:cover">'
+    :'<span style="font-weight:700;font-size:12px;color:#414751">'+item.name.slice(0,3)+'</span>')
+    +'</div>'
+    +'<div style="flex:1;min-width:0">'
+    +'<p style="font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+item.name+'</p>'
+    +'<p style="font-size:12px;color:#414751;margin-top:2px">'+item.code+' · คงเหลือ '+item.qty+' '+(item.unit||'')+'</p>'
+    +'</div>'
   document.getElementById('withdraw-unit').value=item.unit||''
 }
 
@@ -478,45 +434,26 @@ async function submitWithdraw(){
   if(!code){showToast('กรุณากรอกรหัสสินค้า','error');return}
   const item=itemsData.find(i=>i.code===code||i.name.includes(code))
   if(!item){showToast('ไม่พบสินค้า','error');return}
-  if(item.qty<qty){showToast(`สินค้าไม่พอ มีเพียง ${item.qty} ${item.unit}`,'error');return}
+  if(item.qty<qty){showToast('สินค้าไม่พอ มีเพียง '+item.qty+' '+item.unit,'error');return}
   showToast('กำลังบันทึก...','hourglass_empty')
   const{error}=await sb.rpc('withdraw_item',{p_member_id:memberId,p_item_id:item.id,p_qty:qty,p_approver_email:item.approver_email||null,p_note:note,p_branch:'บ้านศรีนครินทร์'})
   if(error){showToast('เบิกไม่สำเร็จ: '+error.message,'error');return}
   showToast('บันทึกการเบิกสำเร็จ ✓','check_circle')
   await loadItems()
-  setTimeout(()=>switchTab('history'),1200)
+  setTimeout(()=>showTab('history'),1500)
 }
 
-function openQR(){document.getElementById('qr-panel').classList.add('open')}
-function closeQR(){document.getElementById('qr-panel').classList.remove('open')}
-
-function showToast(msg,icon='check_circle'){
+// ── TOAST ──────────────────────────────────
+let _toastTimer=null
+function showToast(msg,icon){
+  icon=icon||'check_circle'
   document.getElementById('toast-msg').textContent=msg
   document.getElementById('toast-icon').textContent=icon
   const t=document.getElementById('toast')
   t.style.transform='translateX(-50%) translateY(0)'
-  clearTimeout(window._toastTimer)
-  window._toastTimer=setTimeout(()=>{t.style.transform='translateX(-50%) translateY(120px)'},2500)
+  clearTimeout(_toastTimer)
+  _toastTimer=setTimeout(function(){t.style.transform='translateX(-50%) translateY(120px)'},2500)
 }
-
-document.addEventListener('DOMContentLoaded',async()=>{
-  document.getElementById('page-login').style.display='flex'
-  document.getElementById('page-app').style.display='none'
-  document.getElementById('qr-panel').addEventListener('click',e=>{if(e.target===e.currentTarget)closeQR()})
-  document.getElementById('search-input-desktop').addEventListener('input',()=>{
-    searchQuery=document.getElementById('search-input-desktop').value
-    renderGrid()
-  })
-  const{data:{session}}=await sb.auth.getSession()
-  if(session){
-    const initials=session.user.email.slice(0,2).toUpperCase()
-    document.getElementById('user-initials').textContent=initials
-    document.getElementById('desktop-initials').textContent=initials
-    document.getElementById('sidebar-initials').textContent=initials
-    document.getElementById('sidebar-email').textContent=session.user.email
-    showPage('app')
-  }
-})
 </script>
 </body>
 </html>
