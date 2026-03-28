@@ -246,6 +246,13 @@ let itemsData=[],currentFilter='all',searchQuery=''
 
 // ── INIT ──────────────────────────────────
 document.addEventListener('DOMContentLoaded',async()=>{
+  // Handle img errors via event delegation
+  document.addEventListener('error',function(e){
+    if(e.target.classList&&e.target.classList.contains('item-img')){
+      var fb=e.target.getAttribute('data-fallback')||'?'
+      e.target.parentElement.innerHTML='<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:Manrope,sans-serif;font-weight:700;font-size:28px;color:#727783">'+fb+'</div>'
+    }
+  },true)
   const{data:{session}}=await sb.auth.getSession()
   if(session){
     setUserInfo(session.user.email)
@@ -318,50 +325,69 @@ async function loadItems(){
 
 function renderGrid(){
   const grid=document.getElementById('item-grid')
-  const filtered=itemsData.filter(item=>{
-    const matchType=currentFilter==='all'||item.item_type===currentFilter
-    const q=searchQuery.toLowerCase()
+  const filtered=itemsData.filter(function(item){
+    var matchType=currentFilter==='all'||item.item_type===currentFilter
+    var q=searchQuery.toLowerCase()
     return(!q||item.name.toLowerCase().includes(q)||item.code.toLowerCase().includes(q)||(item.category||'').toLowerCase().includes(q))&&matchType
   })
   if(!filtered.length){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;color:#414751;padding:60px">ไม่พบรายการ</div>';return}
-  const cards=filtered.map(item=>{
-    const isAsset=item.item_type==='asset'
-    const isOut=item.qty===0
-    const isLow=item.qty>0&&item.qty<=5
-    const pct=Math.min(100,Math.round(item.qty/50*100))
-    const barColor=isOut?'#ba1a1a':isLow?'#753400':'#004786'
-    const badge=isAsset?'<span style="background:#dbeafe;color:#1d4ed8;font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px;text-transform:uppercase">ทรัพย์สิน</span>':'<span style="background:#ffdbc9;color:#753400;font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px;text-transform:uppercase">ของเบิก</span>'
-    const status=isOut?'<span style="font-size:11px;font-weight:600;color:#ba1a1a;display:flex;align-items:center;gap:4px"><span style="width:6px;height:6px;border-radius:50%;background:#ba1a1a;display:inline-block"></span>หมดแล้ว</span>':isLow?'<span style="font-size:11px;font-weight:600;color:#753400;display:flex;align-items:center;gap:4px"><span style="width:6px;height:6px;border-radius:50%;background:#753400;display:inline-block"></span>ใกล้หมด</span>':'<span style="font-size:11px;font-weight:600;color:#004786;display:flex;align-items:center;gap:4px"><span style="width:6px;height:6px;border-radius:50%;background:#004786;display:inline-block;animation:pulse 2s infinite"></span>ปกติ</span>'
-    const short=item.name.slice(0,3)
-    const imgSrc=item.image_url||''
-    return '<div class="card-hover fade-in" style="background:white;border-radius:14px;overflow:hidden;box-shadow:0 1px 6px rgba(25,28,33,0.08)">'
-      +'<div style="height:180px;background:#ecedf5;position:relative;overflow:hidden'+(isOut?';filter:grayscale(0.8)':'')+'">'
-      +(imgSrc?'<img src="'+imgSrc+'" alt="'+short+'" style="width:100%;height:100%;object-fit:cover" loading="lazy" onerror="this.parentElement.innerHTML=\'<div style=\\\"width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:Manrope,sans-serif;font-weight:700;font-size:24px;color:#727783\\\">'+short+'</div>\'">'
-        :'<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:Manrope,sans-serif;font-weight:700;font-size:28px;color:#727783">'+short+'</div>')
-      +'<div style="position:absolute;top:10px;left:10px">'+badge+'</div>'
-      +'</div>'
-      +'<div style="padding:14px">'
-      +'<p style="font-size:10px;color:#414751;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px">'+item.code+'</p>'
-      +'<h4 style="font-family:Manrope,sans-serif;font-weight:700;font-size:14px;color:#191c21;margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.4">'+item.name+'</h4>'
-      +'<div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#414751;margin-bottom:8px"><span>'+( item.category||'—')+'</span>'+status+'</div>'
-      +'</div>'
-      +'<div style="height:3px;background:#f2f3fb"><div style="height:100%;background:'+barColor+';width:'+pct+'%;transition:width 0.5s"></div></div>'
-      +'</div>'
+  grid.innerHTML=''
+  filtered.forEach(function(item){
+    var isAsset=item.item_type==='asset'
+    var isOut=item.qty===0
+    var isLow=item.qty>0&&item.qty<=5
+    var pct=Math.min(100,Math.round(item.qty/50*100))
+    var barColor=isOut?'#ba1a1a':isLow?'#753400':'#004786'
+    var badge=isAsset
+      ?'<span style="background:#dbeafe;color:#1d4ed8;font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px">ทรัพย์สิน</span>'
+      :'<span style="background:#ffdbc9;color:#753400;font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px">ของเบิก</span>'
+    var status=isOut
+      ?'<span style="font-size:11px;font-weight:600;color:#ba1a1a">● หมดแล้ว</span>'
+      :isLow
+      ?'<span style="font-size:11px;font-weight:600;color:#753400">● ใกล้หมด</span>'
+      :'<span style="font-size:11px;font-weight:600;color:#004786">● ปกติ</span>'
+    var card=document.createElement('div')
+    card.className='card-hover fade-in'
+    card.style.cssText='background:white;border-radius:14px;overflow:hidden;box-shadow:0 1px 6px rgba(25,28,33,0.08)'
+    var imgDiv=document.createElement('div')
+    imgDiv.style.cssText='height:180px;background:#ecedf5;position:relative;overflow:hidden'+(isOut?';filter:grayscale(0.8)':'')
+    if(item.image_url){
+      var img=document.createElement('img')
+      img.src=item.image_url
+      img.loading='lazy'
+      img.style.cssText='width:100%;height:100%;object-fit:cover'
+      img.onerror=function(){
+        var fb=document.createElement('div')
+        fb.style.cssText='width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:Manrope,sans-serif;font-weight:700;font-size:28px;color:#727783'
+        fb.textContent=item.name.slice(0,3)
+        imgDiv.replaceChild(fb,img)
+      }
+      imgDiv.appendChild(img)
+    } else {
+      var fb=document.createElement('div')
+      fb.style.cssText='width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:Manrope,sans-serif;font-weight:700;font-size:28px;color:#727783'
+      fb.textContent=item.name.slice(0,3)
+      imgDiv.appendChild(fb)
+    }
+    var badgeDiv=document.createElement('div')
+    badgeDiv.style.cssText='position:absolute;top:10px;left:10px'
+    badgeDiv.innerHTML=badge
+    imgDiv.appendChild(badgeDiv)
+    card.appendChild(imgDiv)
+    var infoDiv=document.createElement('div')
+    infoDiv.style.cssText='padding:14px'
+    infoDiv.innerHTML='<p style="font-size:10px;color:#414751;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px">'+item.code+'</p>'
+      +'<h4 style="font-family:Manrope,sans-serif;font-weight:700;font-size:14px;color:#191c21;margin-bottom:6px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">'+item.name+'</h4>'
+      +'<div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#414751"><span>'+(item.category||'—')+'</span>'+status+'</div>'
+    card.appendChild(infoDiv)
+    var barWrap=document.createElement('div')
+    barWrap.style.cssText='height:3px;background:#f2f3fb'
+    var bar=document.createElement('div')
+    bar.style.cssText='height:100%;background:'+barColor+';width:'+pct+'%;transition:width 0.5s'
+    barWrap.appendChild(bar)
+    card.appendChild(barWrap)
+    grid.appendChild(card)
   })
-  grid.innerHTML=cards.join('')
-}
-
-function filterType(t){
-  currentFilter=t
-  document.querySelectorAll('[id^="ftab-"]').forEach(b=>{b.style.color='#414751';b.style.borderBottomColor='transparent'})
-  const btn=document.getElementById('ftab-'+t)
-  if(btn){btn.style.color='#1d4ed8';btn.style.borderBottomColor='#1d4ed8'}
-  renderGrid()
-}
-
-function filterItems(){
-  searchQuery=document.getElementById('search-input').value
-  renderGrid()
 }
 
 // ── HISTORY ───────────────────────────────
