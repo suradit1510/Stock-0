@@ -495,7 +495,8 @@ function showToast(msg,icon='check_circle'){
   document.getElementById('toast-icon').textContent=icon
   const t=document.getElementById('toast')
   t.style.transform='translateX(-50%) translateY(0)'
-  setTimeout(()=>t.style.transform='translateX(-50%) translateY(80px)',2800)
+  clearTimeout(window._toastTimer)
+  window._toastTimer=setTimeout(()=>{t.style.transform='translateX(-50%) translateY(120px)'},2500)
 }
 
 document.addEventListener('DOMContentLoaded',async()=>{
