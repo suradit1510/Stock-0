@@ -543,7 +543,7 @@ function renderCartItems(){
     card.appendChild(imgDiv)
     var info=document.createElement('div')
     info.style.cssText='padding:6px 8px'
-    info.innerHTML='<p style="font-size:10px;color:#414751;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600">'+item.name+'</p><p style="font-size:9px;color:#727783">'+item.code+'</p>'
+    info.innerHTML='<p style="font-size:10px;color:#414751;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600">'+item.name+'</p><p style="font-size:9px;display:flex;justify-content:space-between"><span style="color:#727783">'+item.code+'</span><span style="color:'+(item.qty===0?'#ba1a1a':item.qty<=5?'#753400':'#004786')+';font-weight:700">'+(item.qty===0?'หมด':item.qty+' '+(item.unit||''))+'</span></p>'
     card.appendChild(info)
     list.appendChild(card)
   })
