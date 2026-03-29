@@ -171,7 +171,7 @@ input[type=number]{-moz-appearance:textfield}
           <div id="cart-cat-filter" style="display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none"></div>
         </div>
         <!-- Grid -->
-        <div id="cart-item-list" class="scroll" style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:12px;align-content:start;overflow-y:auto;flex:1;min-height:0" ontouchstart="document.activeElement.blur()"></div>
+        <div id="cart-item-list" class="scroll" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:12px;align-content:start;overflow-y:auto;flex:1;min-height:0;max-width:480px;margin:0 auto;width:100%" ontouchstart="document.activeElement.blur()"></div>
         <!-- Cart bar -->
         <div id="cart-bar" onclick="goStep(3)" style="background:linear-gradient(135deg,#005faf,#004786);color:white;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;flex-shrink:0;padding-bottom:max(14px,env(safe-area-inset-bottom))">
           <div style="display:flex;align-items:center;gap:10px">
@@ -425,11 +425,11 @@ function renderGrid(){
       var img=document.createElement('img')
       img.src=item.image_url
       img.loading='lazy'
-      img.style.cssText='width:100%;height:100%;object-fit:cover'
-      img.onerror=function(){imgDiv.innerHTML='<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:Manrope,sans-serif;font-weight:700;font-size:22px;color:#727783">'+item.name.slice(0,2)+'</div>'}
+      img.style.cssText='position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover'
+      img.onerror=function(){imgDiv.innerHTML='<div style="position:absolute;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:Manrope,sans-serif;font-weight:700;font-size:22px;color:#727783">'+item.name.slice(0,2)+'</div>'}
       imgDiv.appendChild(img)
     } else {
-      imgDiv.innerHTML='<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:Manrope,sans-serif;font-weight:700;font-size:22px;color:#727783">'+item.name.slice(0,2)+'</div>'
+      imgDiv.innerHTML='<div style="position:absolute;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:Manrope,sans-serif;font-weight:700;font-size:22px;color:#727783">'+item.name.slice(0,2)+'</div>'
     }
     // Badge
     var badge=document.createElement('div')
@@ -539,16 +539,16 @@ function renderCartItems(){
     card.onclick=function(){if(!isOut)openQtyPopup(item)}
     // image
     var imgDiv=document.createElement('div')
-    imgDiv.style.cssText='height:120px;background:#ecedf5;overflow:hidden;position:relative;flex-shrink:0'+(isOut?';filter:grayscale(0.7)':'')
+    imgDiv.style.cssText='padding-top:75%;background:#ecedf5;overflow:hidden;position:relative;flex-shrink:0'+(isOut?';filter:grayscale(0.7)':'')
     if(item.image_url){
       var img=document.createElement('img')
       img.src=item.image_url
       img.loading='lazy'
-      img.style.cssText='width:100%;height:100%;object-fit:cover'
-      img.onerror=function(){imgDiv.innerHTML='<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:Manrope,sans-serif;font-weight:700;font-size:22px;color:#727783">'+item.name.slice(0,2)+'</div>'}
+      img.style.cssText='position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover'
+      img.onerror=function(){imgDiv.innerHTML='<div style="position:absolute;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:Manrope,sans-serif;font-weight:700;font-size:22px;color:#727783">'+item.name.slice(0,2)+'</div>'}
       imgDiv.appendChild(img)
     } else {
-      imgDiv.innerHTML='<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:Manrope,sans-serif;font-weight:700;font-size:22px;color:#727783">'+item.name.slice(0,2)+'</div>'
+      imgDiv.innerHTML='<div style="position:absolute;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:Manrope,sans-serif;font-weight:700;font-size:22px;color:#727783">'+item.name.slice(0,2)+'</div>'
     }
     // in-cart badge
     if(inCart){
