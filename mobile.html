@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1"/>
+<title>Stock Zero</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Inter',sans-serif;background:#f9f9ff;color:#191c21;height:100dvh;overflow:hidden;display:flex;flex-direction:column}
+.material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;font-family:'Material Symbols Outlined';font-style:normal;display:inline-block;line-height:1}
+.fill-icon{font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24}
+.page{display:none;flex-direction:column;flex:1;overflow:hidden;height:100%}
+.page.active{display:flex}
+.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.scrollbar-hide::-webkit-scrollbar{display:none}
+.scrollbar-hide{-ms-overflow-style:none;scrollbar-width:none}
+input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none}
+input[type=number]{-moz-appearance:textfield}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeIn 0.2s ease forwards}
+.card{background:white;border-radius:14px;overflow:hidden;box-shadow:0 4px 16px rgba(25,28,33,0.06);transition:transform 0.15s}
+.card:active{transform:scale(0.97)}
+</style>
+</head>
+<body>
+
+<!-- ═══ LOGIN ═══ -->
+<div id="page-login" class="page" style="display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#f9f9ff,#e7e8ef);padding:24px;min-height:100dvh">
+  <div style="width:100%;max-width:360px">
+    <div style="text-align:center;margin-bottom:28px">
+      <div style="width:64px;height:64px;border-radius:16px;background:linear-gradient(135deg,#005faf,#004786);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;box-shadow:0 8px 24px rgba(0,71,134,0.25)">
+        <span class="material-symbols-outlined fill-icon" style="color:white;font-size:32px">inventory_2</span>
+      </div>
+      <h1 style="font-family:'Manrope',sans-serif;font-size:22px;font-weight:800;color:#191c21">Stock Project Zero</h1>
+      <p style="color:#414751;font-size:13px;margin-top:4px">บ้านศรีนครินทร์</p>
+    </div>
+    <div style="background:white;border-radius:20px;padding:24px;box-shadow:0 16px 40px rgba(25,28,33,0.1)">
+      <div style="margin-bottom:14px">
+        <label style="display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#414751;margin-bottom:7px">อีเมล</label>
+        <div style="position:relative">
+          <span class="material-symbols-outlined" style="position:absolute;left:11px;top:50%;transform:translateY(-50%);color:#727783;font-size:17px">mail</span>
+          <input id="login-email" type="email" placeholder="name@example.com" style="width:100%;padding:11px 11px 11px 36px;border-radius:10px;border:1.5px solid #e1e2e9;background:#f9f9ff;font-size:14px;outline:none;font-family:'Inter',sans-serif;transition:border-color 0.2s" onfocus="this.style.borderColor='#004786'" onblur="this.style.borderColor='#e1e2e9'"/>
+        </div>
+      </div>
+      <div style="margin-bottom:20px">
+        <label style="display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#414751;margin-bottom:7px">รหัสผ่าน</label>
+        <div style="position:relative">
+          <span class="material-symbols-outlined" style="position:absolute;left:11px;top:50%;transform:translateY(-50%);color:#727783;font-size:17px">lock</span>
+          <input id="login-password" type="password" placeholder="••••••••" style="width:100%;padding:11px 11px 11px 36px;border-radius:10px;border:1.5px solid #e1e2e9;background:#f9f9ff;font-size:14px;outline:none;font-family:'Inter',sans-serif;transition:border-color 0.2s" onfocus="this.style.borderColor='#004786'" onblur="this.style.borderColor='#e1e2e9'"/>
+        </div>
+      </div>
+      <button onclick="doLogin()" style="width:100%;padding:13px;border-radius:12px;border:none;background:linear-gradient(135deg,#005faf,#004786);color:white;font-family:'Manrope',sans-serif;font-weight:700;font-size:15px;cursor:pointer;box-shadow:0 4px 16px rgba(0,71,134,0.3)">เข้าสู่ระบบ</button>
+      <p id="login-error" style="display:none;color:#ba1a1a;font-size:13px;text-align:center;margin-top:10px"></p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ APP ═══ -->
+<div id="page-app" class="page" style="display:none">
+
+  <!-- Topbar -->
+  <nav style="background:white;border-bottom:1px solid #e1e2e9;padding:12px 16px;padding-top:max(12px,env(safe-area-inset-top));display:flex;align-items:center;justify-content:space-between;flex-shrink:0;position:sticky;top:0;z-index:30;backdrop-filter:blur(12px)">
+    <div style="display:flex;align-items:center;gap:8px">
+      <span class="material-symbols-outlined fill-icon" style="color:#005faf;font-size:20px">inventory_2</span>
+      <span id="topbar-title" style="font-family:'Manrope',sans-serif;font-weight:800;font-size:17px;color:#005faf;letter-spacing:0.02em">คลังสินค้า</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px">
+      <button onclick="toggleSearch()" id="search-btn" style="width:36px;height:36px;border:none;background:none;cursor:pointer;border-radius:50%;display:flex;align-items:center;justify-content:center">
+        <span class="material-symbols-outlined" style="color:#414751;font-size:20px">search</span>
+      </button>
+      <button onclick="doLogout()" style="width:32px;height:32px;border-radius:50%;background:#d4e3ff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center">
+        <span id="user-initials" style="font-family:'Manrope',sans-serif;font-weight:700;font-size:11px;color:#004786">SU</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Content -->
+  <div style="flex:1;overflow:hidden;position:relative">
+
+    <!-- INVENTORY -->
+    <div id="tab-inventory" class="page active">
+      <div id="search-bar" style="display:none;background:white;padding:8px 16px;border-bottom:1px solid #e1e2e9">
+        <div style="position:relative">
+          <span class="material-symbols-outlined" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#727783;font-size:15px">search</span>
+          <input id="search-input" oninput="filterItems()" type="text" placeholder="ค้นหาชื่อสินค้า หรือ SKU..." style="width:100%;padding:10px 16px 10px 36px;border-radius:20px;border:none;background:#ecedf5;font-size:13px;outline:none;font-family:'Inter',sans-serif"/>
+        </div>
+      </div>
+      <!-- Type filter pills -->
+      <div style="display:flex;align-items:center;gap:8px;overflow-x:auto;padding:10px 16px 0;scrollbar-width:none" class="scrollbar-hide">
+        <button onclick="filterType('all')" id="ftab-all" style="padding:7px 18px;border-radius:20px;background:#004786;color:white;border:none;font-size:13px;font-weight:600;white-space:nowrap;cursor:pointer;flex-shrink:0;font-family:'Inter',sans-serif">ทั้งหมด</button>
+        <button onclick="filterType('asset')" id="ftab-asset" style="padding:7px 18px;border-radius:20px;background:#ecedf5;color:#414751;border:none;font-size:13px;font-weight:600;white-space:nowrap;cursor:pointer;flex-shrink:0;font-family:'Inter',sans-serif">ทรัพย์สิน</button>
+        <button onclick="filterType('supply')" id="ftab-supply" style="padding:7px 18px;border-radius:20px;background:#ecedf5;color:#414751;border:none;font-size:13px;font-weight:600;white-space:nowrap;cursor:pointer;flex-shrink:0;font-family:'Inter',sans-serif">ของเบิก</button>
+      </div>
+      <!-- Category filter pills -->
+      <div id="cat-pills" style="display:flex;gap:6px;overflow-x:auto;padding:8px 16px;scrollbar-width:none" class="scrollbar-hide"></div>
+      <!-- Grid -->
+      <div class="scroll" style="padding:0 16px 100px">
+        <div id="item-grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:4px 0 16px">
+          <div style="grid-column:span 2;text-align:center;color:#414751;padding:40px;font-size:14px">กำลังโหลด...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HISTORY -->
+    <div id="tab-history" class="page">
+      <div class="scroll" style="padding:16px">
+        <h2 style="font-family:'Manrope',sans-serif;font-size:20px;font-weight:800;margin-bottom:14px">ประวัติการเบิก</h2>
+        <div id="history-list" style="display:flex;flex-direction:column;gap:10px">
+          <div style="text-align:center;color:#414751;padding:40px;font-size:14px">กำลังโหลด...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WITHDRAW -->
+    <div id="tab-withdraw" class="page">
+      <div class="scroll" style="padding:16px;display:flex;flex-direction:column;gap:12px;padding-bottom:100px">
+        <h2 style="font-family:'Manrope',sans-serif;font-size:20px;font-weight:800">เบิกของ</h2>
+
+        <!-- ผู้เบิก -->
+        <div class="card" style="padding:16px">
+          <p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#414751;margin-bottom:8px">ผู้เบิก</p>
+          <select id="withdraw-member" style="width:100%;padding:10px 12px;border-radius:10px;border:1.5px solid #e1e2e9;background:#f9f9ff;font-size:14px;outline:none;font-family:'Inter',sans-serif"><option value="">— เลือกบุคลากร —</option></select>
+        </div>
+
+        <!-- ตะกร้า -->
+        <div class="card">
+          <div style="padding:12px 16px;border-bottom:1px solid #e1e2e9;display:flex;align-items:center;justify-content:space-between">
+            <div style="display:flex;align-items:center;gap:8px">
+              <span class="material-symbols-outlined" style="color:#004786;font-size:18px">shopping_cart</span>
+              <span style="font-family:'Manrope',sans-serif;font-weight:700;font-size:14px">ตะกร้าเบิก</span>
+            </div>
+            <span id="cart-count" style="background:#004786;color:white;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px">0</span>
+          </div>
+          <div id="cart-list" style="min-height:50px">
+            <div style="text-align:center;color:#727783;font-size:13px;padding:16px">ยังไม่มีรายการ</div>
+          </div>
+          <div style="padding:10px 16px;border-top:1px solid #e1e2e9;display:flex;justify-content:space-between">
+            <span style="font-size:13px;color:#414751">รวม</span>
+            <span id="cart-total" style="font-family:'Manrope',sans-serif;font-weight:700;font-size:14px">0 รายการ</span>
+          </div>
+        </div>
+
+        <!-- เลือกสินค้า -->
+        <div class="card" style="padding:16px">
+          <p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#414751;margin-bottom:8px">เลือกสินค้า</p>
+          <div style="position:relative;margin-bottom:10px">
+            <span class="material-symbols-outlined" style="position:absolute;left:11px;top:50%;transform:translateY(-50%);color:#727783;font-size:15px">search</span>
+            <input id="cart-search" oninput="renderCartItems()" type="text" placeholder="ค้นหา..." style="width:100%;padding:9px 14px 9px 34px;border-radius:10px;border:1.5px solid #e1e2e9;background:#f9f9ff;font-size:13px;outline:none;font-family:'Inter',sans-serif"/>
+          </div>
+          <div id="cart-item-list" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-height:280px;overflow-y:auto"></div>
+        </div>
+
+        <!-- หมายเหตุ + รูป -->
+        <div class="card" style="padding:16px">
+          <div style="margin-bottom:12px">
+            <label style="display:block;font-size:12px;font-weight:600;color:#414751;margin-bottom:6px">หมายเหตุ</label>
+            <input id="withdraw-note" type="text" placeholder="เช่น ทำอาหารเด็กและครู" style="width:100%;padding:10px 12px;border-radius:10px;border:1.5px solid #e1e2e9;background:#f9f9ff;font-size:14px;outline:none;font-family:'Inter',sans-serif"/>
+          </div>
+          <div>
+            <label style="display:block;font-size:12px;font-weight:600;color:#414751;margin-bottom:6px">รูปถ่าย (ไม่บังคับ)</label>
+            <div id="photo-preview" style="display:none;margin-bottom:8px"><img id="photo-img" style="width:100%;max-height:140px;object-fit:cover;border-radius:10px"/></div>
+            <label style="display:flex;align-items:center;gap:8px;padding:10px 12px;border:1.5px dashed #c1c6d3;border-radius:10px;cursor:pointer;background:#f9f9ff">
+              <span class="material-symbols-outlined" style="color:#727783;font-size:18px">photo_camera</span>
+              <span style="font-size:13px;color:#414751">ถ่ายหรือเลือกรูป</span>
+              <input id="withdraw-photo" type="file" accept="image/*" capture="environment" style="display:none" onchange="previewPhoto(this)"/>
+            </label>
+          </div>
+        </div>
+
+        <button onclick="submitCart()" style="width:100%;padding:14px;border-radius:14px;border:none;background:linear-gradient(135deg,#005faf,#004786);color:white;font-family:'Manrope',sans-serif;font-weight:700;font-size:15px;cursor:pointer;box-shadow:0 4px 16px rgba(0,71,134,0.25)">ยืนยันการเบิก</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom Nav -->
+  <nav style="background:rgba(255,255,255,0.9);backdrop-filter:blur(20px);border-top:1px solid #e1e2e9;display:flex;align-items:center;flex-shrink:0;padding-bottom:env(safe-area-inset-bottom);box-shadow:0 -4px 20px rgba(25,28,33,0.06);border-radius:20px 20px 0 0">
+    <button onclick="switchTab('inventory')" id="nav-inventory" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px;border:none;background:#f2f3fb;cursor:pointer;border-radius:16px;margin:6px 4px 0">
+      <span class="material-symbols-outlined fill-icon" style="font-size:22px;color:#005faf">inventory_2</span>
+      <p style="font-size:10px;font-weight:600;color:#005faf;font-family:'Inter',sans-serif">คลัง</p>
+    </button>
+    <button onclick="switchTab('history')" id="nav-history" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px;border:none;background:none;cursor:pointer">
+      <span class="material-symbols-outlined" style="font-size:22px;color:#414751">history</span>
+      <p style="font-size:10px;font-weight:600;color:#414751;font-family:'Inter',sans-serif">ประวัติ</p>
+    </button>
+    <button onclick="switchTab('withdraw')" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:0 4px 8px;border:none;background:none;cursor:pointer">
+      <div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#005faf,#004786);display:flex;align-items:center;justify-content:center;margin-top:-14px;box-shadow:0 4px 16px rgba(0,71,134,0.4)">
+        <span class="material-symbols-outlined" style="color:white;font-size:24px">output</span>
+      </div>
+      <p style="font-size:10px;font-weight:600;color:#414751;font-family:'Inter',sans-serif">เบิก</p>
+    </button>
+    <button style="flex:1;border:none;background:none"></button>
+    <button onclick="doLogout()" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px;border:none;background:none;cursor:pointer">
+      <span class="material-symbols-outlined" style="font-size:22px;color:#414751">logout</span>
+      <p style="font-size:10px;font-weight:600;color:#414751;font-family:'Inter',sans-serif">ออก</p>
+    </button>
+  </nav>
+
+</div>
+
+<!-- Toast -->
+<div id="toast" style="position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(100px);z-index:100;display:flex;align-items:center;gap:10px;background:#191c21;color:white;border-radius:14px;padding:12px 18px;pointer-events:none;min-width:180px;max-width:calc(100vw - 32px);box-shadow:0 8px 24px rgba(0,0,0,0.2);transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1)">
+  <span id="toast-icon" class="material-symbols-outlined fill-icon" style="font-size:16px;flex-shrink:0">check_circle</span>
+  <p id="toast-msg" style="font-size:13px;font-weight:500;flex:1;margin:0">สำเร็จ</p>
+</div>
+
+<script>
+const SUPABASE_URL='https://nyzkwpzndzoyzchewrlt.supabase.co'
+const SUPABASE_ANON='sb_publishable_cf7NpV4z6jc7YyiDcXxTpw_ihoVQzld'
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_ANON)
+let itemsData=[],currentFilter='all',currentCat='all',searchQuery='',cart=[]
+
+document.addEventListener('DOMContentLoaded',async()=>{
+  document.getElementById('page-login').style.display='none'
+  document.getElementById('page-app').style.display='none'
+  const{data:{session}}=await sb.auth.getSession()
+  if(session){setUserInfo(session.user.email);showApp()}
+  else document.getElementById('page-login').style.display='flex'
+})
+
+async function doLogin(){
+  const email=document.getElementById('login-email').value.trim()
+  const pass=document.getElementById('login-password').value
+  const err=document.getElementById('login-error')
+  err.style.display='none'
+  if(!email||!pass){err.textContent='กรุณากรอก email และรหัสผ่าน';err.style.display='block';return}
+  const{data,error}=await sb.auth.signInWithPassword({email,password:pass})
+  if(error){err.textContent='Login ไม่สำเร็จ: '+error.message;err.style.display='block';return}
+  setUserInfo(data.user.email);showApp()
+}
+async function doLogout(){
+  await sb.auth.signOut()
+  document.getElementById('page-app').style.display='none'
+  document.getElementById('page-login').style.display='flex'
+}
+function setUserInfo(e){document.getElementById('user-initials').textContent=e.slice(0,2).toUpperCase()}
+function showApp(){
+  document.getElementById('page-login').style.display='none'
+  document.getElementById('page-app').style.display='flex'
+  loadItems()
+}
+
+function switchTab(tab){
+  ['inventory','history','withdraw'].forEach(t=>{
+    document.getElementById('tab-'+t).classList.remove('active')
+  })
+  document.getElementById('tab-'+tab).classList.add('active')
+  const titles={inventory:'คลังสินค้า',history:'ประวัติการเบิก',withdraw:'เบิกของ'}
+  document.getElementById('topbar-title').textContent=titles[tab]
+  document.getElementById('search-btn').style.display=tab==='inventory'?'flex':'none'
+  // nav highlight
+  const navs=['inventory','history']
+  navs.forEach(n=>{
+    const b=document.getElementById('nav-'+n)
+    if(!b)return
+    if(n===tab){b.style.background='#f2f3fb';b.querySelector('span').style.color='#005faf';b.querySelector('p').style.color='#005faf'}
+    else{b.style.background='none';b.querySelector('span').style.color='#414751';b.querySelector('p').style.color='#414751'}
+  })
+  if(tab==='history')loadHistory()
+  if(tab==='withdraw'){renderCartItems();renderCartList()}
+}
+
+async function loadItems(){
+  document.getElementById('item-grid').innerHTML='<div style="grid-column:span 2;text-align:center;color:#414751;padding:40px;font-size:14px">กำลังโหลด...</div>'
+  const{data}=await sb.from('items').select('*').order('code')
+  itemsData=data||[]
+  const{data:mData}=await sb.from('members').select('*').order('id')
+  const sel=document.getElementById('withdraw-member')
+  sel.innerHTML='<option value="">— เลือกบุคลากร —</option>'+(mData||[]).map(m=>'<option value="'+m.id+'">'+m.name+'</option>').join('')
+  buildCatPills()
+  renderGrid()
+}
+
+function buildCatPills(){
+  var cats=['all']
+  itemsData.forEach(function(item){if(item.category&&cats.indexOf(item.category)<0)cats.push(item.category)})
+  var container=document.getElementById('cat-pills')
+  container.innerHTML=''
+  cats.forEach(function(cat){
+    var btn=document.createElement('button')
+    btn.textContent=cat==='all'?'ทุกหมวด':cat
+    btn.style.cssText='padding:5px 14px;border-radius:20px;border:1px solid '+(cat===currentCat?'#004786':'#c1c6d3')+';background:'+(cat===currentCat?'rgba(0,71,134,0.08)':'transparent')+';color:'+(cat===currentCat?'#004786':'#414751')+';font-size:12px;font-weight:600;white-space:nowrap;cursor:pointer;flex-shrink:0;font-family:Inter,sans-serif'
+    btn.onclick=function(){currentCat=cat;buildCatPills();renderGrid()}
+    container.appendChild(btn)
+  })
+}
+
+function renderGrid(){
+  const grid=document.getElementById('item-grid')
+  const filtered=itemsData.filter(function(item){
+    var mt=currentFilter==='all'||item.item_type===currentFilter
+    var mc=currentCat==='all'||item.category===currentCat
+    var q=searchQuery.toLowerCase()
+    return(!q||item.name.toLowerCase().includes(q)||item.code.toLowerCase().includes(q))&&mt&&mc
+  })
+  if(!filtered.length){grid.innerHTML='<div style="grid-column:span 2;text-align:center;color:#414751;padding:40px;font-size:14px">ไม่พบรายการ</div>';return}
+  grid.innerHTML=''
+  filtered.forEach(function(item){
+    var isOut=item.qty===0
+    var isAsset=item.item_type==='asset'
+    var card=document.createElement('div')
+    card.style.cssText='background:white;border-radius:14px;overflow:hidden;box-shadow:0 4px 16px rgba(25,28,33,0.06);transition:transform 0.15s;cursor:pointer'
+    card.ontouchstart=function(){this.style.transform='scale(0.97)'}
+    card.ontouchend=function(){this.style.transform='scale(1)'}
+
+    // Image
+    var imgDiv=document.createElement('div')
+    imgDiv.style.cssText='aspect-ratio:1;background:#ecedf5;position:relative;overflow:hidden'+(isOut?';filter:grayscale(0.8)':'')
+    if(item.image_url){
+      var img=document.createElement('img')
+      img.src=item.image_url
+      img.loading='lazy'
+      img.style.cssText='width:100%;height:100%;object-fit:cover'
+      img.onerror=function(){imgDiv.innerHTML='<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:Manrope,sans-serif;font-weight:700;font-size:22px;color:#727783">'+item.name.slice(0,2)+'</div>'}
+      imgDiv.appendChild(img)
+    } else {
+      imgDiv.innerHTML='<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:Manrope,sans-serif;font-weight:700;font-size:22px;color:#727783">'+item.name.slice(0,2)+'</div>'
+    }
+    // Badge
+    var badge=document.createElement('div')
+    badge.style.cssText='position:absolute;top:8px;left:8px'
+    badge.innerHTML=isAsset
+      ?'<span style="background:#dbeafe;color:#1d4ed8;font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;text-transform:uppercase">ทรัพย์สิน</span>'
+      :'<span style="background:#ffdbc9;color:#753400;font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;text-transform:uppercase">ของเบิก</span>'
+    imgDiv.appendChild(badge)
+    card.appendChild(imgDiv)
+
+    // Info
+    var info=document.createElement('div')
+    info.style.cssText='padding:10px 12px'
+    var nameEl=document.createElement('h3')
+    nameEl.style.cssText='font-family:Manrope,sans-serif;font-weight:700;font-size:13px;color:#191c21;line-height:1.3;margin-bottom:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden'
+    nameEl.textContent=item.name
+    info.appendChild(nameEl)
+
+    var metaEl=document.createElement('div')
+    metaEl.style.cssText='display:flex;flex-direction:column;gap:1px;margin-bottom:8px'
+    metaEl.innerHTML='<span style="color:#414751;font-size:9px;text-transform:uppercase;letter-spacing:0.05em">'+item.code+'</span>'
+      +'<span style="color:#414751;font-size:9px">'+( item.category||'—')+'</span>'
+    info.appendChild(metaEl)
+
+    var qtyRow=document.createElement('div')
+    qtyRow.style.cssText='display:flex;align-items:flex-end;justify-content:space-between'
+    var qtyEl=document.createElement('div')
+    qtyEl.innerHTML='<span style="font-family:Manrope,sans-serif;font-size:18px;font-weight:800;color:'+(isOut?'#ba1a1a':'#191c21')+'">'+item.qty+'</span>'
+      +(item.unit?'<span style="font-size:11px;color:#414751;margin-left:2px">'+item.unit+'</span>':'')
+    var statusEl=document.createElement('span')
+    statusEl.textContent=isOut?'หมด':item.qty<=5?'ใกล้หมด':'ปกติ'
+    statusEl.style.cssText='font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;'+(isOut?'background:#ffdad6;color:#93000a':item.qty<=5?'background:#ffdbc9;color:#753400':'background:#c2d8fe;color:#495e7f')
+    qtyRow.appendChild(qtyEl)
+    qtyRow.appendChild(statusEl)
+    info.appendChild(qtyRow)
+    card.appendChild(info)
+    grid.appendChild(card)
+  })
+}
+
+function filterType(t){
+  currentFilter=t
+  document.querySelectorAll('[id^="ftab-"]').forEach(function(b){b.style.background='#ecedf5';b.style.color='#414751'})
+  var btn=document.getElementById('ftab-'+t)
+  if(btn){btn.style.background='#004786';btn.style.color='white'}
+  renderGrid()
+}
+
+function toggleSearch(){
+  var bar=document.getElementById('search-bar')
+  var show=bar.style.display==='none'||!bar.style.display
+  bar.style.display=show?'block':'none'
+  if(show)document.getElementById('search-input').focus()
+  else{searchQuery='';renderGrid()}
+}
+function filterItems(){searchQuery=document.getElementById('search-input').value;renderGrid()}
+
+async function loadHistory(){
+  document.getElementById('history-list').innerHTML='<div style="text-align:center;color:#414751;padding:40px;font-size:14px">กำลังโหลด...</div>'
+  const{data}=await sb.from('withdrawals').select('id,qty,withdrawn_at,note,members(name),items(name,unit)').order('withdrawn_at',{ascending:false}).limit(50)
+  if(!data||!data.length){document.getElementById('history-list').innerHTML='<div style="text-align:center;color:#414751;padding:40px;font-size:14px">ยังไม่มีประวัติ</div>';return}
+  document.getElementById('history-list').innerHTML=data.map(h=>{
+    const d=new Date(h.withdrawn_at)
+    const ds=d.getDate()+'/'+(d.getMonth()+1)+'/'+(d.getFullYear()-543)+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')
+    return '<div class="fade-in" style="background:white;border-radius:12px;padding:14px 16px;box-shadow:0 2px 8px rgba(25,28,33,0.06);display:flex;justify-content:space-between;gap:12px">'
+      +'<div style="flex:1;min-width:0">'
+      +'<p style="font-weight:700;font-size:14px;color:#191c21;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(h.items&&h.items.name||'—')+'</p>'
+      +'<p style="font-size:12px;color:#414751;margin-top:3px">'+(h.members&&h.members.name||'—')+' · '+ds+'</p>'
+      +(h.note?'<p style="font-size:11px;color:#727783;font-style:italic;margin-top:2px">"'+h.note+'"</p>':'')
+      +'</div>'
+      +'<div style="text-align:right;flex-shrink:0">'
+      +'<p style="font-family:Manrope,sans-serif;font-weight:700;font-size:14px">'+h.qty+' '+(h.items&&h.items.unit||'')+'</p>'
+      +'</div></div>'
+  }).join('')
+}
+
+// Cart
+function renderCartItems(){
+  var q=(document.getElementById('cart-search')||{}).value||''
+  var filtered=itemsData.filter(function(i){return !q||i.name.toLowerCase().includes(q.toLowerCase())||i.code.toLowerCase().includes(q.toLowerCase())}).slice(0,30)
+  var list=document.getElementById('cart-item-list')
+  if(!list)return
+  list.innerHTML=''
+  filtered.forEach(function(item){
+    var inCart=cart.find(function(c){return c.item.id===item.id})
+    var card=document.createElement('div')
+    card.style.cssText='border-radius:10px;overflow:hidden;cursor:pointer;border:2px solid '+(inCart?'#004786':'#e1e2e9')+';background:white;transition:all 0.15s'
+    card.onclick=function(){addToCart(item)}
+    var imgDiv=document.createElement('div')
+    imgDiv.style.cssText='height:70px;background:#ecedf5;overflow:hidden;position:relative'
+    if(item.image_url){
+      var img=document.createElement('img')
+      img.src=item.image_url
+      img.style.cssText='width:100%;height:100%;object-fit:cover'
+      img.onerror=function(){imgDiv.innerHTML='<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:Manrope,sans-serif;font-weight:700;font-size:16px;color:#727783">'+item.name.slice(0,2)+'</div>'}
+      imgDiv.appendChild(img)
+    } else {
+      imgDiv.innerHTML='<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:Manrope,sans-serif;font-weight:700;font-size:16px;color:#727783">'+item.name.slice(0,2)+'</div>'
+    }
+    if(inCart){
+      var badge=document.createElement('div')
+      badge.style.cssText='position:absolute;top:3px;right:3px;background:#004786;color:white;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700'
+      badge.textContent=inCart.qty
+      imgDiv.appendChild(badge)
+    }
+    card.appendChild(imgDiv)
+    var dStr=''
+    if(item.created_at){var cd=new Date(item.created_at);dStr=cd.getDate()+'/'+(cd.getMonth()+1)+'/'+(cd.getFullYear()+543).toString().slice(-2)}
+    var info=document.createElement('div')
+    info.style.cssText='padding:5px 6px'
+    info.innerHTML='<p style="font-size:9px;color:#414751;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600">'+item.name+'</p>'
+      +'<p style="font-size:8px;color:#a0aab4">'+dStr+'</p>'
+      +'<p style="font-size:8px;display:flex;justify-content:space-between"><span style="color:#727783">'+item.code+'</span><span style="color:'+(item.qty===0?'#ba1a1a':item.qty<=5?'#753400':'#004786')+';font-weight:700">'+(item.qty===0?'หมด':item.qty+' '+(item.unit||''))+'</span></p>'
+    card.appendChild(info)
+    list.appendChild(card)
+  })
+}
+
+function addToCart(item){
+  var ex=cart.find(function(c){return c.item.id===item.id})
+  if(ex)ex.qty++
+  else cart.push({item:item,qty:1})
+  renderCartItems();renderCartList()
+}
+function removeFromCart(id){cart=cart.filter(function(c){return c.item.id!==id});renderCartItems();renderCartList()}
+function updateCartQty(id,delta){
+  var e=cart.find(function(c){return c.item.id===id})
+  if(e){e.qty=Math.max(1,e.qty+delta);renderCartItems();renderCartList()}
+}
+
+function renderCartList(){
+  var list=document.getElementById('cart-list')
+  var countEl=document.getElementById('cart-count')
+  var totalEl=document.getElementById('cart-total')
+  if(countEl)countEl.textContent=cart.length
+  if(totalEl)totalEl.textContent=cart.length+' รายการ'
+  if(!cart.length){list.innerHTML='<div style="text-align:center;color:#727783;font-size:13px;padding:16px">ยังไม่มีรายการ</div>';return}
+  list.innerHTML=''
+  cart.forEach(function(entry){
+    var row=document.createElement('div')
+    row.style.cssText='display:flex;align-items:center;gap:8px;padding:8px 14px;border-bottom:1px solid #f2f3fb'
+    var imgDiv=document.createElement('div')
+    imgDiv.style.cssText='width:36px;height:36px;border-radius:8px;background:#ecedf5;flex-shrink:0;overflow:hidden'
+    if(entry.item.image_url){imgDiv.innerHTML='<img src="'+entry.item.image_url+'" style="width:100%;height:100%;object-fit:cover">'}
+    else{imgDiv.innerHTML='<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;color:#727783">'+entry.item.name.slice(0,2)+'</div>'}
+    row.appendChild(imgDiv)
+    var info=document.createElement('div')
+    info.style.cssText='flex:1;min-width:0'
+    info.innerHTML='<p style="font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+entry.item.name+'</p><p style="font-size:10px;color:#727783">'+entry.item.code+'</p>'
+    row.appendChild(info)
+    var ctrl=document.createElement('div')
+    ctrl.style.cssText='display:flex;align-items:center;gap:4px;flex-shrink:0'
+    var bm=document.createElement('button')
+    bm.textContent='-'
+    bm.style.cssText='width:22px;height:22px;border-radius:6px;border:1px solid #e1e2e9;background:white;cursor:pointer;font-weight:700'
+    bm.onclick=function(){updateCartQty(entry.item.id,-1)}
+    var qi=document.createElement('input')
+    qi.type='number';qi.value=entry.qty;qi.min=1
+    qi.style.cssText='width:36px;text-align:center;border:1px solid #e1e2e9;border-radius:6px;padding:2px 4px;font-weight:700;font-size:13px;outline:none'
+    qi.onchange=function(){var v=parseInt(this.value)||1;if(v<1)v=1;this.value=v;var en=cart.find(function(c){return c.item.id===entry.item.id});if(en){en.qty=v;renderCartItems();renderCartList()}}
+    var bp=document.createElement('button')
+    bp.textContent='+'
+    bp.style.cssText='width:22px;height:22px;border-radius:6px;border:1px solid #e1e2e9;background:white;cursor:pointer;font-weight:700'
+    bp.onclick=function(){updateCartQty(entry.item.id,1)}
+    var bd=document.createElement('button')
+    bd.innerHTML='<span class="material-symbols-outlined" style="font-size:14px;color:#ba1a1a">delete</span>'
+    bd.style.cssText='width:22px;height:22px;border-radius:6px;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center'
+    bd.onclick=function(){removeFromCart(entry.item.id)}
+    ctrl.appendChild(bm);ctrl.appendChild(qi);ctrl.appendChild(bp);ctrl.appendChild(bd)
+    row.appendChild(ctrl)
+    list.appendChild(row)
+  })
+}
+
+function previewPhoto(input){
+  if(!input.files||!input.files[0])return
+  var reader=new FileReader()
+  reader.onload=function(e){document.getElementById('photo-img').src=e.target.result;document.getElementById('photo-preview').style.display='block'}
+  reader.readAsDataURL(input.files[0])
+}
+
+async function uploadPhoto(file){
+  if(!file)return null
+  try{
+    var ext=file.name.split('.').pop()||'jpg'
+    var path='withdrawals/'+Date.now()+'.'+ext
+    var{error}=await sb.storage.from('withdrawals').upload(path,file,{contentType:file.type})
+    if(error)return null
+    var{data}=sb.storage.from('withdrawals').getPublicUrl(path)
+    return data.publicUrl
+  }catch(e){return null}
+}
+
+async function submitCart(){
+  var memberId=document.getElementById('withdraw-member').value
+  var note=document.getElementById('withdraw-note').value
+  var photoFile=document.getElementById('withdraw-photo').files[0]
+  if(!memberId){showToast('กรุณาเลือกผู้เบิก','error');return}
+  if(!cart.length){showToast('ยังไม่มีสินค้าในตะกร้า','error');return}
+  for(var i=0;i<cart.length;i++){if(cart[i].qty>cart[i].item.qty){showToast('สินค้า "'+cart[i].item.name+'" ไม่พอ','error');return}}
+  showToast('กำลังบันทึก...','hourglass_empty')
+  var photoUrl=await uploadPhoto(photoFile)
+  var errors=[]
+  for(var j=0;j<cart.length;j++){
+    var c=cart[j]
+    var res=await sb.rpc('withdraw_item',{p_member_id:memberId,p_item_id:c.item.id,p_qty:c.qty,p_approver_email:c.item.approver_email||null,p_note:note+(photoUrl?' [รูป:'+photoUrl+']':''),p_branch:'บ้านศรีนครินทร์'})
+    if(res.error)errors.push(c.item.name)
+  }
+  if(errors.length){showToast('บางรายการล้มเหลว','error');return}
+  showToast('บันทึกสำเร็จ '+cart.length+' รายการ ✓','check_circle')
+  cart=[]
+  document.getElementById('withdraw-note').value=''
+  document.getElementById('withdraw-photo').value=''
+  document.getElementById('photo-preview').style.display='none'
+  renderCartList()
+  await loadItems()
+  setTimeout(function(){switchTab('history')},1500)
+}
+
+let _toastTimer=null
+function showToast(msg,icon){
+  icon=icon||'check_circle'
+  document.getElementById('toast-msg').textContent=msg
+  document.getElementById('toast-icon').textContent=icon
+  var t=document.getElementById('toast')
+  t.style.transform='translateX(-50%) translateY(0)'
+  clearTimeout(_toastTimer)
+  _toastTimer=setTimeout(function(){t.style.transform='translateX(-50%) translateY(100px)'},2500)
+}
+</script>
+</body>
+</html>
