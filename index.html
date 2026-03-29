@@ -545,7 +545,11 @@ function renderCartItems(){
     card.appendChild(imgDiv)
     var info=document.createElement('div')
     info.style.cssText='padding:6px 8px'
-    info.innerHTML='<p style="font-size:10px;color:#414751;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600">'+item.name+'</p><p style="font-size:9px;display:flex;justify-content:space-between"><span style="color:#727783">'+item.code+'</span><span style="color:'+(item.qty===0?'#ba1a1a':item.qty<=5?'#753400':'#004786')+';font-weight:700">'+(item.qty===0?'หมด':item.qty+' '+(item.unit||''))+'</span></p>'
+    var dStr=''
+    if(item.created_at){var cd=new Date(item.created_at);dStr=cd.getDate()+'/'+(cd.getMonth()+1)+'/'+(cd.getFullYear()+543).toString().slice(-2)}
+    info.innerHTML='<p style="font-size:10px;color:#414751;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600">'+item.name+'</p>'
+      +'<p style="font-size:9px;color:#a0aab4;margin-bottom:1px">'+dStr+'</p>'
+      +'<p style="font-size:9px;display:flex;justify-content:space-between"><span style="color:#727783">'+item.code+'</span><span style="color:'+(item.qty===0?'#ba1a1a':item.qty<=5?'#753400':'#004786')+';font-weight:700">'+(item.qty===0?'หมด':item.qty+' '+(item.unit||''))+'</span></p>'
     card.appendChild(info)
     list.appendChild(card)
   })
@@ -603,12 +607,7 @@ function renderCartList(){
     row.appendChild(imgDiv)
     var info=document.createElement('div')
     info.style.cssText='flex:1;min-width:0'
-    var dateStr=''
-    if(entry.item.created_at){
-      var dd=new Date(entry.item.created_at)
-      dateStr=' · '+dd.getDate()+'/'+(dd.getMonth()+1)+'/'+(dd.getFullYear()+543).toString().slice(-2)
-    }
-    info.innerHTML='<p style="font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+entry.item.name+'</p><p style="font-size:11px;color:#727783">'+entry.item.code+dateStr+'</p>'
+    info.innerHTML='<p style="font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+entry.item.name+'</p><p style="font-size:11px;color:#727783">'+entry.item.code+'</p>'
     row.appendChild(info)
     var qtyCtrl=document.createElement('div')
     qtyCtrl.style.cssText='display:flex;align-items:center;gap:4px;flex-shrink:0'
