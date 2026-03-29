@@ -19,8 +19,8 @@ body{background-color:#f9f9ff;color:#191c21;font-family:'Inter',sans-serif}
 h1,h2,h3,h4{font-family:'Manrope',sans-serif}
 .scrollbar-hide::-webkit-scrollbar{display:none}
 .scrollbar-hide{-ms-overflow-style:none;scrollbar-width:none}
-#page-login{display:none}
-#page-app{display:none}
+#page-login{display:none !important}
+#page-app{display:none !important}
 .tab-section{display:none}
 #tab-inventory{display:block}
 .nav-link.active{color:#1d4ed8;background:rgba(255,255,255,0.5);font-weight:700}
@@ -284,8 +284,10 @@ async function doLogin(){
 
 async function doLogout(){
   await sb.auth.signOut()
-  document.getElementById('page-app').style.display='none'
-  document.getElementById('page-login').style.display='flex'
+  var login=document.getElementById('page-login')
+  var app=document.getElementById('page-app')
+  app.style.cssText='display:none !important'
+  login.style.cssText='display:flex;min-height:100vh;width:100%;align-items:center;justify-content:center;background:linear-gradient(135deg,#f9f9ff,#e7e8ef)'
 }
 
 function setUserInfo(email){
@@ -295,8 +297,10 @@ function setUserInfo(email){
 }
 
 function showApp(){
-  document.getElementById('page-login').style.display='none'
-  document.getElementById('page-app').style.display='flex'
+  var login=document.getElementById('page-login')
+  var app=document.getElementById('page-app')
+  login.style.cssText='display:none !important'
+  app.style.cssText='display:flex;min-height:100vh;width:100%'
   loadItems()
 }
 
