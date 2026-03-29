@@ -19,8 +19,8 @@ body{background-color:#f9f9ff;color:#191c21;font-family:'Inter',sans-serif}
 h1,h2,h3,h4{font-family:'Manrope',sans-serif}
 .scrollbar-hide::-webkit-scrollbar{display:none}
 .scrollbar-hide{-ms-overflow-style:none;scrollbar-width:none}
-#page-login{display:none !important}
-#page-app{display:none !important}
+#page-login{display:none}
+#page-app{display:none}
 .tab-section{display:none}
 #tab-inventory{display:block}
 .nav-link.active{color:#1d4ed8;background:rgba(255,255,255,0.5);font-weight:700}
@@ -253,13 +253,15 @@ let itemsData=[],currentFilter='all',searchQuery=''
 
 // ── INIT ──────────────────────────────────
 document.addEventListener('DOMContentLoaded',async()=>{
-  // Handle img errors via event delegation
   document.addEventListener('error',function(e){
     if(e.target.classList&&e.target.classList.contains('item-img')){
       var fb=e.target.getAttribute('data-fallback')||'?'
       e.target.parentElement.innerHTML='<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:Manrope,sans-serif;font-weight:700;font-size:28px;color:#727783">'+fb+'</div>'
     }
   },true)
+  // ซ่อนทุกหน้าก่อน แล้วค่อยแสดงหน้าที่ถูกต้อง
+  document.getElementById('page-login').style.display='none'
+  document.getElementById('page-app').style.display='none'
   const{data:{session}}=await sb.auth.getSession()
   if(session){
     setUserInfo(session.user.email)
@@ -284,10 +286,8 @@ async function doLogin(){
 
 async function doLogout(){
   await sb.auth.signOut()
-  var login=document.getElementById('page-login')
-  var app=document.getElementById('page-app')
-  app.style.cssText='display:none !important'
-  login.style.cssText='display:flex;min-height:100vh;width:100%;align-items:center;justify-content:center;background:linear-gradient(135deg,#f9f9ff,#e7e8ef)'
+  document.getElementById('page-app').style.display='none'
+  document.getElementById('page-login').style.display='flex'
 }
 
 function setUserInfo(email){
@@ -297,10 +297,8 @@ function setUserInfo(email){
 }
 
 function showApp(){
-  var login=document.getElementById('page-login')
-  var app=document.getElementById('page-app')
-  login.style.cssText='display:none !important'
-  app.style.cssText='display:flex;min-height:100vh;width:100%'
+  document.getElementById('page-login').style.display='none'
+  document.getElementById('page-app').style.display='flex'
   loadItems()
 }
 
