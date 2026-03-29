@@ -144,36 +144,41 @@ input[type=number]{-moz-appearance:textfield}
 
       <!-- STEP 2: เลือกสินค้า -->
       <div id="step-2" style="display:none;flex-direction:column;height:100%">
-        <div style="background:white;border-bottom:1px solid #e1e2e9;padding:12px 16px;flex-shrink:0">
-          <!-- Progress -->
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-            <div style="width:24px;height:24px;border-radius:50%;background:#004786;color:white;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">✓</div>
-            <div style="flex:1;height:3px;background:#004786;border-radius:2px"></div>
-            <div style="width:24px;height:24px;border-radius:50%;background:#004786;color:white;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">2</div>
-            <div style="flex:1;height:3px;background:#e1e2e9;border-radius:2px"></div>
-            <div style="width:24px;height:24px;border-radius:50%;background:#e1e2e9;color:#727783;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">3</div>
-          </div>
+        <!-- Header -->
+        <div style="background:white;border-bottom:1px solid #e1e2e9;padding:10px 16px;flex-shrink:0">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-            <div>
-              <p id="step2-member" style="font-size:12px;color:#414751">ผู้เบิก: —</p>
+            <div style="display:flex;align-items:center;gap:8px">
+              <button onclick="goStep(1)" style="border:none;background:#f2f3fb;cursor:pointer;display:flex;align-items:center;gap:4px;color:#004786;font-size:13px;font-weight:600;font-family:'Inter',sans-serif;padding:6px 10px;border-radius:8px">
+                <span class="material-symbols-outlined" style="font-size:16px">arrow_back</span>ย้อน
+              </button>
+              <p id="step2-member" style="font-size:13px;font-weight:600;color:#191c21">—</p>
             </div>
-            <button onclick="goStep(1)" style="border:none;background:none;cursor:pointer;display:flex;align-items:center;gap:4px;color:#004786;font-size:13px;font-weight:600;font-family:'Inter',sans-serif;padding:4px 8px;border-radius:8px;background:#f2f3fb">
-              <span class="material-symbols-outlined" style="font-size:16px">arrow_back</span>ย้อนกลับ
-            </button>
+            <!-- Progress dots -->
+            <div style="display:flex;align-items:center;gap:4px">
+              <div style="width:8px;height:8px;border-radius:50%;background:#004786"></div>
+              <div style="width:20px;height:3px;border-radius:2px;background:#004786"></div>
+              <div style="width:8px;height:8px;border-radius:50%;background:#004786"></div>
+              <div style="width:20px;height:3px;border-radius:2px;background:#e1e2e9"></div>
+              <div style="width:8px;height:8px;border-radius:50%;background:#e1e2e9"></div>
+            </div>
           </div>
-          <div style="position:relative">
+          <!-- Search -->
+          <div style="position:relative;margin-bottom:8px">
             <span class="material-symbols-outlined" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#727783;font-size:16px">search</span>
-            <input id="cart-search" oninput="renderCartItems()" type="text" placeholder="ค้นหาชื่อหรือรหัสสินค้า..." style="width:100%;padding:10px 16px 10px 36px;border-radius:20px;border:1.5px solid #e1e2e9;background:#f9f9ff;font-size:13px;outline:none;font-family:'Inter',sans-serif"/>
+            <input id="cart-search" oninput="renderCartItems()" type="text" placeholder="ค้นหาชื่อหรือรหัส..." style="width:100%;padding:9px 16px 9px 36px;border-radius:20px;border:1.5px solid #e1e2e9;background:#f9f9ff;font-size:13px;outline:none;font-family:'Inter',sans-serif"/>
           </div>
+          <!-- Category filter -->
+          <div id="cart-cat-filter" style="display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none"></div>
         </div>
-        <div id="cart-item-list" class="scroll" style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:12px;align-content:start"></div>
+        <!-- Grid -->
+        <div id="cart-item-list" class="scroll" style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:12px 12px 4px;align-content:start" ontouchstart="document.activeElement.blur()"></div>
         <!-- Cart bar -->
         <div id="cart-bar" onclick="goStep(3)" style="background:linear-gradient(135deg,#005faf,#004786);color:white;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;flex-shrink:0;padding-bottom:max(14px,env(safe-area-inset-bottom))">
           <div style="display:flex;align-items:center;gap:10px">
             <span class="material-symbols-outlined" style="font-size:22px">shopping_cart</span>
             <span id="cart-count" style="background:rgba(255,255,255,0.25);padding:2px 10px;border-radius:20px;font-size:13px;font-weight:700">0 รายการ</span>
           </div>
-          <div style="display:flex;align-items:center;gap:6px;font-family:'Manrope',sans-serif;font-weight:700;font-size:15px">
+          <div style="display:flex;align-items:center;gap:4px;font-family:'Manrope',sans-serif;font-weight:700;font-size:15px">
             ดูตะกร้า <span class="material-symbols-outlined" style="font-size:18px">arrow_forward</span>
           </div>
         </div>
@@ -254,6 +259,29 @@ input[type=number]{-moz-appearance:textfield}
 
 </div>
 
+<!-- Qty Popup -->
+<div id="qty-popup" onclick="if(event.target===this)closePopup()" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.5);align-items:flex-end;justify-content:center">
+  <div style="background:white;border-radius:20px 20px 0 0;padding:24px;width:100%;max-width:480px;padding-bottom:max(24px,env(safe-area-inset-bottom))">
+    <div style="width:40px;height:4px;background:#e1e2e9;border-radius:2px;margin:0 auto 20px"></div>
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
+      <div id="popup-img" style="width:56px;height:56px;border-radius:12px;background:#ecedf5;overflow:hidden;flex-shrink:0"></div>
+      <div style="flex:1;min-width:0">
+        <p id="popup-name" style="font-family:'Manrope',sans-serif;font-weight:700;font-size:15px;color:#191c21"></p>
+        <p id="popup-stock" style="font-size:12px;color:#414751;margin-top:2px"></p>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:20px">
+      <button onclick="changePopupQty(-1)" style="width:44px;height:44px;border-radius:50%;border:1.5px solid #e1e2e9;background:white;font-size:24px;font-weight:300;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#191c21">−</button>
+      <input id="popup-qty" type="number" value="1" min="1" style="width:72px;text-align:center;border:1.5px solid #e1e2e9;border-radius:12px;padding:10px;font-size:20px;font-weight:700;outline:none;font-family:'Manrope',sans-serif;-moz-appearance:textfield"/>
+      <button onclick="changePopupQty(1)" style="width:44px;height:44px;border-radius:50%;background:#004786;border:none;font-size:24px;font-weight:300;cursor:pointer;display:flex;align-items:center;justify-content:center;color:white">+</button>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button onclick="closePopup()" style="flex:1;padding:13px;border-radius:12px;border:1.5px solid #e1e2e9;background:white;font-family:'Manrope',sans-serif;font-weight:600;font-size:14px;cursor:pointer;color:#414751">ยกเลิก</button>
+      <button onclick="confirmPopup()" style="flex:2;padding:13px;border-radius:12px;border:none;background:linear-gradient(135deg,#005faf,#004786);color:white;font-family:'Manrope',sans-serif;font-weight:700;font-size:14px;cursor:pointer">เพิ่มเข้าตะกร้า</button>
+    </div>
+  </div>
+</div>
+
 <!-- Toast -->
 <div id="toast" style="position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(200px);z-index:100;display:flex;align-items:center;gap:10px;background:#191c21;color:white;border-radius:14px;padding:12px 18px;pointer-events:none;min-width:180px;max-width:calc(100vw - 32px);box-shadow:0 8px 24px rgba(0,0,0,0.2);transition:transform 0.35s cubic-bezier(0.34,1.56,0.64,1)">
   <span id="toast-icon" class="material-symbols-outlined fill-icon" style="font-size:16px;flex-shrink:0">check_circle</span>
@@ -307,7 +335,11 @@ function goStep(n){
   if(n===2){
     var mSel=document.getElementById('withdraw-member')
     var mName=mSel.options[mSel.selectedIndex]&&mSel.options[mSel.selectedIndex].text||'—'
-    document.getElementById('step2-member').textContent='ผู้เบิก: '+mName
+    document.getElementById('step2-member').textContent=mName
+    // reset cat filter
+    currentCartCat='all'
+    var catContainer=document.getElementById('cart-cat-filter')
+    if(catContainer){catContainer.innerHTML='';delete catContainer.dataset.built}
     renderCartItems()
   }
   if(n===3){renderCartList()}
@@ -484,48 +516,125 @@ async function loadHistory(){
 // Cart
 function renderCartItems(){
   var q=(document.getElementById('cart-search')||{}).value||''
-  var filtered=itemsData.filter(function(i){return !q||i.name.toLowerCase().includes(q.toLowerCase())||i.code.toLowerCase().includes(q.toLowerCase())}).slice(0,60)
+  var catFilter=currentCartCat||'all'
+  var filtered=itemsData.filter(function(i){
+    var mq=!q||i.name.toLowerCase().includes(q.toLowerCase())||i.code.toLowerCase().includes(q.toLowerCase())
+    var mc=catFilter==='all'||i.category===catFilter
+    return mq&&mc
+  }).slice(0,80)
   var list=document.getElementById('cart-item-list')
   if(!list)return
   list.innerHTML=''
   // update cart bar
-  var bar=document.getElementById('cart-bar')
   var countEl=document.getElementById('cart-count')
   if(countEl)countEl.textContent=cart.length+' รายการ'
+  // build category filter
+  buildCartCatFilter()
   filtered.forEach(function(item){
     var inCart=cart.find(function(c){return c.item.id===item.id})
+    var isOut=item.qty===0
     var card=document.createElement('div')
-    card.style.cssText='border-radius:12px;overflow:hidden;cursor:pointer;border:2px solid '+(inCart?'#004786':'#e1e2e9')+';background:white;transition:all 0.15s;box-shadow:0 1px 4px rgba(25,28,33,0.06)'
-    card.onclick=function(){addToCart(item)}
+    card.style.cssText='border-radius:14px;overflow:hidden;cursor:pointer;border:2px solid '+(inCart?'#004786':'transparent')+';background:white;box-shadow:0 2px 8px rgba(25,28,33,0.08);transition:transform 0.15s;position:relative'
     card.ontouchstart=function(){this.style.transform='scale(0.97)'}
     card.ontouchend=function(){this.style.transform='scale(1)'}
+    card.onclick=function(){if(!isOut)openQtyPopup(item)}
+    // image
     var imgDiv=document.createElement('div')
-    imgDiv.style.cssText='aspect-ratio:1;background:#ecedf5;overflow:hidden;position:relative'
+    imgDiv.style.cssText='aspect-ratio:1;background:#ecedf5;overflow:hidden;position:relative'+(isOut?';filter:grayscale(0.7)':'')
     if(item.image_url){
       var img=document.createElement('img')
       img.src=item.image_url
       img.loading='lazy'
       img.style.cssText='width:100%;height:100%;object-fit:cover'
-      img.onerror=function(){imgDiv.innerHTML='<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:Manrope,sans-serif;font-weight:700;font-size:20px;color:#727783">'+item.name.slice(0,2)+'</div>'}
+      img.onerror=function(){imgDiv.innerHTML='<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:Manrope,sans-serif;font-weight:700;font-size:22px;color:#727783">'+item.name.slice(0,2)+'</div>'}
       imgDiv.appendChild(img)
     } else {
-      imgDiv.innerHTML='<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:Manrope,sans-serif;font-weight:700;font-size:20px;color:#727783">'+item.name.slice(0,2)+'</div>'
+      imgDiv.innerHTML='<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:Manrope,sans-serif;font-weight:700;font-size:22px;color:#727783">'+item.name.slice(0,2)+'</div>'
     }
+    // in-cart badge
     if(inCart){
       var badge=document.createElement('div')
-      badge.style.cssText='position:absolute;top:6px;right:6px;background:#004786;color:white;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700'
+      badge.style.cssText='position:absolute;top:6px;right:6px;background:#004786;color:white;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;box-shadow:0 2px 6px rgba(0,71,134,0.4)'
       badge.textContent=inCart.qty
       imgDiv.appendChild(badge)
     }
     card.appendChild(imgDiv)
+    // info
     var info=document.createElement('div')
     info.style.cssText='padding:8px 10px'
-    info.innerHTML='<p style="font-size:12px;color:#191c21;font-weight:700;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:4px">'+item.name+'</p>'
-      +'<p style="font-size:10px;display:flex;justify-content:space-between;align-items:center"><span style="color:#727783">'+item.code+'</span><span style="color:'+(item.qty===0?'#ba1a1a':item.qty<=5?'#753400':'#004786')+';font-weight:700">'+(item.qty===0?'หมด':item.qty+' '+(item.unit||''))+'</span></p>'
+    var nameEl=document.createElement('p')
+    nameEl.style.cssText='font-family:Manrope,sans-serif;font-weight:700;font-size:12px;color:#191c21;line-height:1.3;margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden'
+    nameEl.textContent=item.name
+    var metaEl=document.createElement('div')
+    metaEl.style.cssText='display:flex;justify-content:space-between;align-items:center'
+    metaEl.innerHTML='<span style="font-size:9px;color:#727783">'+item.code+'</span>'
+      +'<span style="font-size:11px;font-weight:700;color:'+(isOut?'#ba1a1a':item.qty<=5?'#753400':'#004786')+'">'+(isOut?'หมด':item.qty+' '+(item.unit||''))+'</span>'
+    info.appendChild(nameEl)
+    info.appendChild(metaEl)
     card.appendChild(info)
     list.appendChild(card)
   })
 }
+
+var currentCartCat='all'
+function buildCartCatFilter(){
+  var container=document.getElementById('cart-cat-filter')
+  if(!container||container.dataset.built)return
+  container.dataset.built='1'
+  var cats=['all']
+  itemsData.forEach(function(item){if(item.category&&cats.indexOf(item.category)<0)cats.push(item.category)})
+  cats.forEach(function(cat){
+    var btn=document.createElement('button')
+    btn.textContent=cat==='all'?'ทุกหมวด':cat
+    btn.dataset.cat=cat
+    btn.style.cssText='padding:5px 12px;border-radius:20px;border:none;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;font-family:Inter,sans-serif;transition:all 0.15s;'+(cat==='all'?'background:#004786;color:white':'background:#ecedf5;color:#414751')
+    btn.onclick=function(){
+      currentCartCat=cat
+      document.querySelectorAll('#cart-cat-filter button').forEach(function(b){
+        b.style.background=b.dataset.cat===cat?'#004786':'#ecedf5'
+        b.style.color=b.dataset.cat===cat?'white':'#414751'
+      })
+      renderCartItems()
+    }
+    container.appendChild(btn)
+  })
+}
+
+var popupItem=null
+function openQtyPopup(item){
+  popupItem=item
+  var inCart=cart.find(function(c){return c.item.id===item.id})
+  document.getElementById('popup-name').textContent=item.name
+  document.getElementById('popup-stock').textContent='คงเหลือ '+item.qty+' '+(item.unit||'')
+  document.getElementById('popup-qty').value=inCart?inCart.qty:1
+  var imgDiv=document.getElementById('popup-img')
+  imgDiv.innerHTML=item.image_url
+    ?'<img src="'+item.image_url+'" style="width:100%;height:100%;object-fit:cover">'
+    :'<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:Manrope,sans-serif;font-weight:700;font-size:18px;color:#727783">'+item.name.slice(0,2)+'</div>'
+  document.getElementById('qty-popup').style.display='flex'
+}
+function closePopup(){
+  document.getElementById('qty-popup').style.display='none'
+  popupItem=null
+}
+function changePopupQty(d){
+  var input=document.getElementById('popup-qty')
+  var v=parseInt(input.value)||1
+  input.value=Math.max(1,v+d)
+}
+function confirmPopup(){
+  if(!popupItem)return
+  var qty=parseInt(document.getElementById('popup-qty').value)||1
+  if(qty>popupItem.qty){showToast('สินค้าไม่พอ มีเพียง '+popupItem.qty+' '+(popupItem.unit||''),'error');return}
+  var ex=cart.find(function(c){return c.item.id===popupItem.id})
+  if(ex)ex.qty=qty
+  else cart.push({item:popupItem,qty:qty})
+  closePopup()
+  renderCartItems()
+  renderCartList()
+  showToast('เพิ่ม "'+popupItem.name+'" เข้าตะกร้าแล้ว','check_circle')
+}
+
 
 function addToCart(item){
   var ex=cart.find(function(c){return c.item.id===item.id})
