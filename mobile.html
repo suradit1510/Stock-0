@@ -533,13 +533,13 @@ function renderCartItems(){
     var inCart=cart.find(function(c){return c.item.id===item.id})
     var isOut=item.qty===0
     var card=document.createElement('div')
-    card.style.cssText='border-radius:14px;overflow:hidden;cursor:pointer;border:2px solid '+(inCart?'#004786':'transparent')+';background:white;box-shadow:0 2px 8px rgba(25,28,33,0.08);transition:transform 0.15s;position:relative'
+    card.style.cssText='border-radius:14px;overflow:hidden;cursor:pointer;border:2px solid '+(inCart?'#004786':'transparent')+';background:white;box-shadow:0 2px 8px rgba(25,28,33,0.08);transition:transform 0.15s;display:flex;flex-direction:column'
     card.ontouchstart=function(){this.style.transform='scale(0.97)'}
     card.ontouchend=function(){this.style.transform='scale(1)'}
     card.onclick=function(){if(!isOut)openQtyPopup(item)}
     // image
     var imgDiv=document.createElement('div')
-    imgDiv.style.cssText='height:140px;background:#ecedf5;overflow:hidden;position:relative'+(isOut?';filter:grayscale(0.7)':'')
+    imgDiv.style.cssText='height:120px;background:#ecedf5;overflow:hidden;position:relative;flex-shrink:0'+(isOut?';filter:grayscale(0.7)':'')
     if(item.image_url){
       var img=document.createElement('img')
       img.src=item.image_url
