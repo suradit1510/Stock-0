@@ -97,7 +97,7 @@ input[type=number]{-moz-appearance:textfield}
       <!-- Category filter pills -->
       <div id="cat-pills" style="display:flex;gap:6px;overflow-x:auto;padding:8px 16px;scrollbar-width:none" class="scrollbar-hide"></div>
       <!-- Grid -->
-      <div class="scroll" style="padding:0 16px 100px">
+      <div class="scroll" style="padding:0 16px 100px" ontouchstart="document.activeElement.blur()">
         <div id="item-grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:4px 0 16px">
           <div style="grid-column:span 2;text-align:center;color:#414751;padding:40px;font-size:14px">กำลังโหลด...</div>
         </div>
@@ -177,28 +177,20 @@ input[type=number]{-moz-appearance:textfield}
   </div>
 
   <!-- Bottom Nav -->
-  <nav style="background:rgba(255,255,255,0.95);backdrop-filter:blur(20px);border-top:1px solid #e1e2e9;display:flex;align-items:flex-end;flex-shrink:0;padding:0 8px;padding-bottom:max(12px,env(safe-area-inset-bottom));box-shadow:0 -2px 12px rgba(25,28,33,0.06);position:relative;z-index:20">
-    <button onclick="switchTab('inventory')" id="nav-inventory" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 4px 0;border:none;background:none;cursor:pointer">
-      <span class="material-symbols-outlined fill-icon" style="font-size:22px;color:#005faf">inventory_2</span>
-      <p style="font-size:10px;font-weight:600;color:#005faf;font-family:'Inter',sans-serif">คลัง</p>
+  <nav id="bottom-nav" style="background:rgba(255,255,255,0.95);backdrop-filter:blur(20px);border-top:1px solid #e1e2e9;display:flex;align-items:flex-end;flex-shrink:0;padding:0 16px;padding-bottom:max(14px,env(safe-area-inset-bottom));box-shadow:0 -2px 12px rgba(25,28,33,0.06);z-index:20">
+    <button onclick="switchTab('inventory')" id="nav-inventory" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 4px 0;border:none;background:none;cursor:pointer">
+      <span class="material-symbols-outlined fill-icon" style="font-size:24px;color:#005faf">inventory_2</span>
+      <p style="font-size:11px;font-weight:600;color:#005faf;font-family:'Inter',sans-serif">คลัง</p>
     </button>
-    <button onclick="switchTab('history')" id="nav-history" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 4px 0;border:none;background:none;cursor:pointer">
-      <span class="material-symbols-outlined" style="font-size:22px;color:#414751">history</span>
-      <p style="font-size:10px;font-weight:600;color:#414751;font-family:'Inter',sans-serif">ประวัติ</p>
-    </button>
-    <button onclick="switchTab('withdraw')" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:0 4px;border:none;background:none;cursor:pointer;position:relative">
-      <div style="width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,#005faf,#004786);display:flex;align-items:center;justify-content:center;margin-top:-16px;box-shadow:0 4px 16px rgba(0,71,134,0.4);flex-shrink:0">
-        <span class="material-symbols-outlined" style="color:white;font-size:22px">output</span>
+    <button onclick="switchTab('withdraw')" id="nav-withdraw" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:0 4px;border:none;background:none;cursor:pointer">
+      <div style="width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,#005faf,#004786);display:flex;align-items:center;justify-content:center;margin-top:-18px;box-shadow:0 4px 16px rgba(0,71,134,0.4)">
+        <span class="material-symbols-outlined" style="color:white;font-size:24px">output</span>
       </div>
-      <p style="font-size:10px;font-weight:600;color:#414751;font-family:'Inter',sans-serif;margin-top:2px">เบิก</p>
+      <p style="font-size:11px;font-weight:600;color:#414751;font-family:'Inter',sans-serif;margin-top:2px">เบิก</p>
     </button>
-    <button onclick="switchTab('history')" style="flex:1;border:none;background:none;padding:10px 4px 0;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer">
-      <span class="material-symbols-outlined" style="font-size:22px;color:transparent">history</span>
-      <p style="font-size:10px;font-family:'Inter',sans-serif;color:transparent">.</p>
-    </button>
-    <button onclick="doLogout()" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 4px 0;border:none;background:none;cursor:pointer">
-      <span class="material-symbols-outlined" style="font-size:22px;color:#414751">logout</span>
-      <p style="font-size:10px;font-weight:600;color:#414751;font-family:'Inter',sans-serif">ออก</p>
+    <button onclick="switchTab('history')" id="nav-history" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 4px 0;border:none;background:none;cursor:pointer">
+      <span class="material-symbols-outlined" style="font-size:24px;color:#414751">history</span>
+      <p style="font-size:11px;font-weight:600;color:#414751;font-family:'Inter',sans-serif">ประวัติ</p>
     </button>
   </nav>
 
@@ -254,13 +246,20 @@ function switchTab(tab){
   const titles={inventory:'คลังสินค้า',history:'ประวัติการเบิก',withdraw:'เบิกของ'}
   document.getElementById('topbar-title').textContent=titles[tab]
   document.getElementById('search-btn').style.display=tab==='inventory'?'flex':'none'
-  // nav highlight
-  const navs=['inventory','history']
-  navs.forEach(n=>{
-    const b=document.getElementById('nav-'+n)
+  // nav highlight - 3 buttons
+  ['inventory','withdraw','history'].forEach(function(n){
+    var b=document.getElementById('nav-'+n)
     if(!b)return
-    if(n===tab){b.style.background='#f2f3fb';b.querySelector('span').style.color='#005faf';b.querySelector('p').style.color='#005faf'}
-    else{b.style.background='none';b.querySelector('span').style.color='#414751';b.querySelector('p').style.color='#414751'}
+    var icon=b.querySelector('span.material-symbols-outlined')
+    var label=b.querySelector('p')
+    if(n===tab){
+      if(icon)icon.style.color='#005faf'
+      if(label)label.style.color='#005faf'
+    } else {
+      if(n==='withdraw'&&icon)icon.style.color='white'
+      else if(icon)icon.style.color='#414751'
+      if(label)label.style.color='#414751'
+    }
   })
   if(tab==='history')loadHistory()
   if(tab==='withdraw'){renderCartItems();renderCartList()}
@@ -345,16 +344,22 @@ function renderGrid(){
       +'<span style="color:#414751;font-size:9px">'+( item.category||'—')+'</span>'
     info.appendChild(metaEl)
 
+    // วันรับเข้า
+    var dateRow=document.createElement('p')
+    dateRow.style.cssText='font-size:10px;color:#a0aab4;margin-bottom:6px'
+    if(item.created_at){var cd=new Date(item.created_at);dateRow.textContent='รับเข้า '+cd.getDate()+'/'+(cd.getMonth()+1)+'/'+(cd.getFullYear()+543).toString().slice(-2)}
+    info.appendChild(dateRow)
+    // จำนวน + สี
     var qtyRow=document.createElement('div')
-    qtyRow.style.cssText='display:flex;align-items:flex-end;justify-content:space-between'
+    qtyRow.style.cssText='display:flex;align-items:center;justify-content:space-between'
     var qtyEl=document.createElement('div')
     qtyEl.innerHTML='<span style="font-family:Manrope,sans-serif;font-size:18px;font-weight:800;color:'+(isOut?'#ba1a1a':'#191c21')+'">'+item.qty+'</span>'
-      +(item.unit?'<span style="font-size:11px;color:#414751;margin-left:2px">'+item.unit+'</span>':'')
-    var statusEl=document.createElement('span')
-    statusEl.textContent=isOut?'หมด':item.qty<=5?'ใกล้หมด':'ปกติ'
-    statusEl.style.cssText='font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;'+(isOut?'background:#ffdad6;color:#93000a':item.qty<=5?'background:#ffdbc9;color:#753400':'background:#c2d8fe;color:#495e7f')
+      +(item.unit?'<span style="font-size:11px;color:#414751;margin-left:3px">'+item.unit+'</span>':'')
+    var qtyLabel=document.createElement('span')
+    qtyLabel.textContent=isOut?'หมด':''
+    qtyLabel.style.cssText='font-size:11px;font-weight:700;color:#ba1a1a'
     qtyRow.appendChild(qtyEl)
-    qtyRow.appendChild(statusEl)
+    qtyRow.appendChild(qtyLabel)
     info.appendChild(qtyRow)
     card.appendChild(info)
     grid.appendChild(card)
