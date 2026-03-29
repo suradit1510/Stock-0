@@ -455,8 +455,11 @@ function renderGrid(){
     card.ontouchend=function(){this.style.transform='scale(1)'}
 
     // Image
+    // image wrapper with padding-top trick
+    var imgOuter=document.createElement('div')
+    imgOuter.style.cssText='width:100%;position:relative'+(isOut?';filter:grayscale(0.8)':'')
     var imgDiv=document.createElement('div')
-    imgDiv.style.cssText='aspect-ratio:1;background:#ecedf5;position:relative;overflow:hidden'+(isOut?';filter:grayscale(0.8)':'')
+    imgDiv.style.cssText='padding-top:100%;background:#ecedf5;position:relative;overflow:hidden'
     if(item.image_url){
       var img=document.createElement('img')
       img.src=item.image_url
@@ -469,12 +472,13 @@ function renderGrid(){
     }
     // Badge
     var badge=document.createElement('div')
-    badge.style.cssText='position:absolute;top:8px;left:8px'
+    badge.style.cssText='position:absolute;top:8px;left:8px;z-index:1'
     badge.innerHTML=isAsset
       ?'<span style="background:#dbeafe;color:#1d4ed8;font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;text-transform:uppercase">ทรัพย์สิน</span>'
       :'<span style="background:#ffdbc9;color:#753400;font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;text-transform:uppercase">ของเบิก</span>'
-    imgDiv.appendChild(badge)
-    card.appendChild(imgDiv)
+    imgOuter.appendChild(imgDiv)
+    imgOuter.appendChild(badge)
+    card.appendChild(imgOuter)
 
     // Info
     var info=document.createElement('div')
