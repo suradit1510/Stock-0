@@ -134,7 +134,14 @@ input[type=number]{-moz-appearance:textfield}
           </div>
           <div class="card" style="padding:20px">
             <p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#414751;margin-bottom:10px">ผู้เบิก</p>
-            <select id="withdraw-member" style="width:100%;padding:12px 14px;border-radius:12px;border:1.5px solid #e1e2e9;background:#f9f9ff;font-size:15px;outline:none;font-family:'Inter',sans-serif;color:#191c21"><option value="">— เลือกบุคลากร —</option></select>
+            <div id="member-dropdown" style="position:relative">
+              <button onclick="toggleMemberList()" id="member-btn" style="width:100%;padding:13px 16px;border-radius:12px;border:1.5px solid #e1e2e9;background:#f9f9ff;font-size:15px;outline:none;font-family:'Inter',sans-serif;color:#727783;text-align:left;cursor:pointer;display:flex;justify-content:space-between;align-items:center">
+                <span id="member-btn-text">— เลือกบุคลากร —</span>
+                <span class="material-symbols-outlined" style="font-size:20px;color:#727783">expand_more</span>
+              </button>
+              <div id="member-list-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);left:0;right:0;background:white;border-radius:12px;box-shadow:0 8px 24px rgba(25,28,33,0.15);z-index:50;overflow:hidden;max-height:280px;overflow-y:auto;border:1px solid #e1e2e9"></div>
+            </div>
+            <input type="hidden" id="withdraw-member" value=""/>
           </div>
         </div>
         <div style="padding:16px;padding-bottom:max(20px,env(safe-area-inset-bottom));flex-shrink:0">
@@ -292,7 +299,7 @@ input[type=number]{-moz-appearance:textfield}
 const SUPABASE_URL='https://nyzkwpzndzoyzchewrlt.supabase.co'
 const SUPABASE_ANON='sb_publishable_cf7NpV4z6jc7YyiDcXxTpw_ihoVQzld'
 const sb=supabase.createClient(SUPABASE_URL,SUPABASE_ANON)
-let itemsData=[],currentFilter='all',currentCat='all',searchQuery='',cart=[]
+let itemsData=[],membersData=[],currentFilter='all',currentCat='all',searchQuery='',cart=[]
 
 document.addEventListener('DOMContentLoaded',async()=>{
   document.getElementById('page-login').style.display='none'
@@ -324,6 +331,19 @@ function showApp(){
   loadItems()
 }
 
+function toggleMemberList(){
+  var dd=document.getElementById('member-list-dropdown')
+  dd.style.display=dd.style.display==='none'?'block':'none'
+}
+// close dropdown when clicking outside
+document.addEventListener('click',function(e){
+  var dd=document.getElementById('member-list-dropdown')
+  var btn=document.getElementById('member-btn')
+  if(dd&&btn&&!btn.contains(e.target)&&!dd.contains(e.target)){
+    dd.style.display='none'
+  }
+})
+
 function goStep(n){
   var member=document.getElementById('withdraw-member').value
   if(n===2&&!member){showToast('กรุณาเลือกผู้เบิกก่อน','error');return}
@@ -333,8 +353,7 @@ function goStep(n){
   document.getElementById('step-3').style.display='none'
   document.getElementById('step-'+n).style.display='flex'
   if(n===2){
-    var mSel=document.getElementById('withdraw-member')
-    var mName=mSel.options[mSel.selectedIndex]&&mSel.options[mSel.selectedIndex].text||'—'
+    var mName=document.getElementById('member-btn-text').textContent||'—'
     document.getElementById('step2-member').textContent=mName
     // reset cat filter
     currentCartCat='all'
@@ -380,8 +399,25 @@ async function loadItems(){
   const{data}=await sb.from('items').select('*').order('code')
   itemsData=data||[]
   const{data:mData}=await sb.from('members').select('*').order('id')
-  const sel=document.getElementById('withdraw-member')
-  sel.innerHTML='<option value="">— เลือกบุคลากร —</option>'+(mData||[]).map(m=>'<option value="'+m.id+'">'+m.name+'</option>').join('')
+  membersData=mData||[]
+  var ddList=document.getElementById('member-list-dropdown')
+  if(ddList){
+    ddList.innerHTML=''
+    membersData.forEach(function(m){
+      var item=document.createElement('div')
+      item.style.cssText='padding:14px 16px;font-size:15px;color:#191c21;cursor:pointer;border-bottom:1px solid #f2f3fb;font-family:Inter,sans-serif'
+      item.textContent=m.name
+      item.ontouchstart=function(){this.style.background='#f2f3fb'}
+      item.ontouchend=function(){this.style.background=''}
+      item.onclick=function(){
+        document.getElementById('withdraw-member').value=m.id
+        document.getElementById('member-btn-text').textContent=m.name
+        document.getElementById('member-btn-text').style.color='#191c21'
+        document.getElementById('member-list-dropdown').style.display='none'
+      }
+      ddList.appendChild(item)
+    })
+  }
   buildCatPills()
   renderGrid()
 }
@@ -576,6 +612,8 @@ function renderCartItems(){
     card.appendChild(info)
     list.appendChild(card)
   })
+  // force repaint
+  requestAnimationFrame(function(){list.style.opacity='0.99';requestAnimationFrame(function(){list.style.opacity='1'})})
 }
 
 var currentCartCat='all'
