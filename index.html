@@ -191,16 +191,16 @@ h1,h2,h3,h4{font-family:'Manrope',sans-serif}
       <!-- WITHDRAW TAB -->
       <div id="tab-withdraw" class="tab-section">
         <h2 style="font-size:22px;font-weight:800;margin-bottom:20px">เบิกของ</h2>
+        <!-- ผู้เบิก - full width -->
+        <div style="background:white;border-radius:16px;padding:20px;box-shadow:0 1px 4px rgba(25,28,33,0.06);margin-bottom:16px">
+          <p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#414751;margin-bottom:10px">ผู้เบิก</p>
+          <select id="withdraw-member" style="width:100%;padding:11px 14px;border-radius:10px;border:1.5px solid #e1e2e9;background:#f9f9ff;font-size:14px;outline:none"><option value="">— เลือกบุคลากร —</option></select>
+        </div>
+
         <div style="display:grid;grid-template-columns:1fr 360px;gap:20px;align-items:start">
 
           <!-- LEFT: เลือกสินค้า -->
           <div style="display:flex;flex-direction:column;gap:16px">
-
-            <!-- ผู้เบิก -->
-            <div style="background:white;border-radius:16px;padding:20px;box-shadow:0 1px 4px rgba(25,28,33,0.06)">
-              <p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#414751;margin-bottom:10px">ผู้เบิก</p>
-              <select id="withdraw-member" style="width:100%;padding:11px 14px;border-radius:10px;border:1.5px solid #e1e2e9;background:#f9f9ff;font-size:14px;outline:none"><option value="">— เลือกบุคลากร —</option></select>
-            </div>
 
             <!-- ค้นหาสินค้า -->
             <div style="background:white;border-radius:16px;padding:20px;box-shadow:0 1px 4px rgba(25,28,33,0.06)">
@@ -235,7 +235,7 @@ h1,h2,h3,h4{font-family:'Manrope',sans-serif}
           </div>
 
           <!-- RIGHT: ตะกร้า -->
-          <div style="background:white;border-radius:16px;box-shadow:0 1px 4px rgba(25,28,33,0.06);position:sticky;top:80px">
+          <div style="background:white;border-radius:16px;box-shadow:0 1px 4px rgba(25,28,33,0.06);position:sticky;top:80px;align-self:start;margin-top:0">
             <div style="padding:16px 20px;border-bottom:1px solid #e1e2e9;display:flex;align-items:center;justify-content:space-between">
               <div style="display:flex;align-items:center;gap:8px">
                 <span class="material-symbols-outlined" style="color:#004786;font-size:20px">shopping_cart</span>
