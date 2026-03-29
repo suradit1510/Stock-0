@@ -609,9 +609,18 @@ function renderCartList(){
     btnMinus.textContent='-'
     btnMinus.style.cssText='width:24px;height:24px;border-radius:6px;border:1px solid #e1e2e9;background:white;cursor:pointer;font-weight:700;font-size:14px'
     btnMinus.onclick=function(){updateCartQty(entry.item.id,-1)}
-    var qtyText=document.createElement('span')
-    qtyText.textContent=entry.qty
-    qtyText.style.cssText='font-weight:700;font-size:14px;min-width:20px;text-align:center'
+    var qtyText=document.createElement('input')
+    qtyText.type='number'
+    qtyText.value=entry.qty
+    qtyText.min=1
+    qtyText.style.cssText='font-weight:700;font-size:14px;width:40px;text-align:center;border:1px solid #e1e2e9;border-radius:6px;padding:2px 4px;outline:none'
+    qtyText.onchange=function(){
+      var v=parseInt(this.value)||1
+      if(v<1)v=1
+      this.value=v
+      var en=cart.find(function(c){return c.item.id===entry.item.id})
+      if(en){en.qty=v;renderCartItems();renderCartList()}
+    }
     var btnPlus=document.createElement('button')
     btnPlus.textContent='+'
     btnPlus.style.cssText='width:24px;height:24px;border-radius:6px;border:1px solid #e1e2e9;background:white;cursor:pointer;font-weight:700;font-size:14px'
