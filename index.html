@@ -603,7 +603,12 @@ function renderCartList(){
     row.appendChild(imgDiv)
     var info=document.createElement('div')
     info.style.cssText='flex:1;min-width:0'
-    info.innerHTML='<p style="font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+entry.item.name+'</p><p style="font-size:11px;color:#727783">'+entry.item.code+'</p>'
+    var dateStr=''
+    if(entry.item.created_at){
+      var dd=new Date(entry.item.created_at)
+      dateStr=' · '+dd.getDate()+'/'+(dd.getMonth()+1)+'/'+(dd.getFullYear()+543).toString().slice(-2)
+    }
+    info.innerHTML='<p style="font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+entry.item.name+'</p><p style="font-size:11px;color:#727783">'+entry.item.code+dateStr+'</p>'
     row.appendChild(info)
     var qtyCtrl=document.createElement('div')
     qtyCtrl.style.cssText='display:flex;align-items:center;gap:4px;flex-shrink:0'
