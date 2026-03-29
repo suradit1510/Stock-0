@@ -540,7 +540,7 @@ function renderCartItems(){
     card.onclick=function(){if(!isOut)openQtyPopup(item)}
     // image
     var imgDiv=document.createElement('div')
-    imgDiv.style.cssText='aspect-ratio:1;background:#ecedf5;overflow:hidden;position:relative'+(isOut?';filter:grayscale(0.7)':'')
+    imgDiv.style.cssText='height:140px;background:#ecedf5;overflow:hidden;position:relative'+(isOut?';filter:grayscale(0.7)':'')
     if(item.image_url){
       var img=document.createElement('img')
       img.src=item.image_url
